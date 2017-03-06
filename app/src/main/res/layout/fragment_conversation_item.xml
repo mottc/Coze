@@ -2,15 +2,14 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="70dp">
 
     <ImageView
         android:id="@+id/avatar"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_margin="5dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/window_bg"/>
+        android:scaleType="centerCrop"/>
 
     <TextView
         android:id="@+id/time"
@@ -25,11 +24,11 @@
         android:id="@+id/unread_num"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:background="@drawable/unread_count_bg"
         android:layout_alignBottom="@id/avatar"
         android:layout_alignParentEnd="true"
-        android:layout_marginRight="5dp"
         android:layout_marginBottom="3dp"
+        android:layout_marginRight="5dp"
+        android:background="@drawable/unread_count_bg"
         android:gravity="center"
         android:textColor="@android:color/white"/>
 
@@ -39,14 +38,15 @@
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
         android:layout_toRightOf="@id/avatar"
-        android:textSize="20sp"
-        android:textColor="#000"/>
+        android:textColor="#000"
+        android:textSize="20sp"/>
+
     <TextView
         android:id="@+id/isGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/userName"
         android:layout_marginTop="10dp"
+        android:layout_toRightOf="@id/userName"
         android:text="@string/group"
         android:textColor="@color/colorAccent"
         android:visibility="gone"/>
@@ -55,19 +55,17 @@
         android:id="@+id/msg_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/avatar"
+        android:layout_alignBottom="@id/avatar"
+        android:layout_marginBottom="3dp"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
-        android:layout_marginBottom="3dp"
-        android:layout_toRightOf="@id/avatar"
         android:layout_toLeftOf="@id/unread_num"
-        android:maxLines="1"
+        android:layout_toRightOf="@id/avatar"
         android:ellipsize="end"
+        android:maxLines="1"
         android:textSize="16sp"/>
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:layout_alignParentBottom="true"
-        android:background="#000"/>
+
+    <include
+        layout="@layout/separator"/>
 
 </RelativeLayout>

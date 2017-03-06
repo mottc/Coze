@@ -109,7 +109,6 @@ public class LoginActivity extends AppCompatActivity {
                 CozeApplication.getInstance().setCurrentUserName(loginUserName);
                 // close it before login to make sure DemoDB not overlap
 
-
                 DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), loginUserName+".db");
                 Database db = helper.getWritableDb();
                 helper.close();

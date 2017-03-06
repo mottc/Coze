@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.hyphenate.chat.EMConversation;
+import com.hyphenate.chat.EMGroup;
 import com.mottc.coze.R;
 import com.mottc.coze.bean.CozeUser;
 import com.mxn.soul.flowingdrawer_core.FlowingDrawer;
@@ -96,7 +97,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onGroupItemClick(CozeUser item) {
+    public void onGroupItemClick(EMGroup item) {
 
     }
 

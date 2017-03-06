@@ -137,7 +137,6 @@ public class CozeApplication extends Application {
     }
 
 
-
     public void setCurrentUserName(String username) {
         this.username = username;
         MyInfo.getInstance(instance).setUserInfo(Constant.KEY_USERNAME, username);
@@ -157,32 +156,11 @@ public class CozeApplication extends Application {
         // 注意：默认的 DaoMaster.DevOpenHelper 会在数据库升级时，删除所有的表，意味着这将导致数据的丢失。
         // 所以，在正式的项目中，你还应该做一层封装，来实现数据库的安全升级。
 
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), loginUserName+".db");
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), loginUserName + ".db");
         Database db = helper.getWritableDb();
         mDaoSession = new DaoMaster(db).newSession();
         return mDaoSession;
     }
-//
-//    public void setContactList(Map<String, EaseUser> contactList) {
-//
-//        this.contactList = contactList;
-//
-//        userDao.saveContactList(new ArrayList<EaseUser>(contactList.values()));
-//
-//    }
-//
-//    public Map<String, EaseUser> getContactList() {
-//
-//        if (contactList == null) {
-//
-//            contactList = userDao.getContactList();
-//
-//        }
-//
-//        contactList = userDao.getContactList();
-//        return contactList;
-//
-//    }
 
     /**
      * 退出登录

@@ -1,6 +1,8 @@
 package com.mottc.coze.main;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,8 +11,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.hyphenate.chat.EMClient;
+import com.hyphenate.chat.EMGroup;
+import com.hyphenate.exceptions.HyphenateException;
 import com.mottc.coze.R;
-import com.mottc.coze.bean.CozeUser;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import jp.co.recruit_lifestyle.android.widget.WaveSwipeRefreshLayout;
 
 /**
  * Created with Android Studio
@@ -20,18 +29,18 @@ import com.mottc.coze.bean.CozeUser;
  */
 public class GroupFragment extends Fragment {
     private OnGroupItemListener mListener;
+    private RecyclerView mRecyclerView;
+    private GroupRecyclerViewAdapter mGroupRecyclerViewAdapter;
+    private List<EMGroup> groupList = new ArrayList<>();
+    private WaveSwipeRefreshLayout mWaveSwipeRefreshLayout;
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
+
     public GroupFragment() {
     }
 
-    // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static ContactFragment newInstance() {
-        ContactFragment fragment = new ContactFragment();
+    public static GroupFragment newInstance() {
+        GroupFragment fragment = new GroupFragment();
 
         return fragment;
     }
@@ -39,21 +48,34 @@ public class GroupFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        getGroupList();
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_contact, container, false);
 
+        mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) view.findViewById(R.id.contact_swipe);
+        mWaveSwipeRefreshLayout.setWaveRGBColor(63, 81, 181);
+        mWaveSwipeRefreshLayout.setColorSchemeColors(Color.WHITE);
+        mWaveSwipeRefreshLayout.setOnRefreshListener(new WaveSwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Do work to refresh the list here.
+                new GroupRefreshTask().execute();
+            }
+        });
         // Set the adapter
-        if (view instanceof RecyclerView) {
+        View recyclerView = view.findViewById(R.id.contact_list);
+        // Set the adapter
+        if (recyclerView instanceof RecyclerView) {
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
-            recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            // recyclerView.setAdapter(new ContactRecyclerViewAdapter(new ArrayList<CozeUser>(), mListener));
-
+            mRecyclerView = (RecyclerView) recyclerView;
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
+            mGroupRecyclerViewAdapter = new GroupRecyclerViewAdapter(groupList, mListener);
+            mRecyclerView.setAdapter(mGroupRecyclerViewAdapter);
         }
         return view;
     }
@@ -76,18 +98,42 @@ public class GroupFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+
+    private void getGroupList() {
+        groupList.clear();
+        groupList.addAll(EMClient.getInstance().groupManager().getAllGroups());
+    }
+
+    private class GroupRefreshTask extends AsyncTask<Void, Void, String[]> {
+
+        List<EMGroup> groupListFromServer = new ArrayList<>();
+        @Override
+        protected String[] doInBackground(Void... params) {
+
+            groupList.clear();
+
+            try {
+                groupListFromServer = EMClient.getInstance().groupManager().getJoinedGroupsFromServer();//需异步处理
+            } catch (HyphenateException e) {
+                e.printStackTrace();
+            }
+
+            return new String[0];
+        }
+
+        @Override
+        protected void onPostExecute(String[] result) {
+            // Call setRefreshing(false) when the list has been refreshed.
+
+            super.onPostExecute(result);
+            groupList.addAll(groupListFromServer);
+            mGroupRecyclerViewAdapter.notifyDataSetChanged();
+            mWaveSwipeRefreshLayout.setRefreshing(false);
+        }
+    }
+
+
     public interface OnGroupItemListener {
-        // TODO: Update argument type and name
-        void onGroupItemClick(CozeUser item);
+        void onGroupItemClick(EMGroup item);
     }
 }

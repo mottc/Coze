@@ -57,4 +57,5 @@ public class CozeUser {
         this.avatar = avatar;
     }
 
+
 }

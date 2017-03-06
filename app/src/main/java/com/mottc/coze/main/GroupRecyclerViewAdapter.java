@@ -7,24 +7,24 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.hyphenate.chat.EMGroup;
 import com.mottc.coze.R;
-import com.mottc.coze.bean.CozeUser;
-import com.mottc.coze.main.ContactFragment.OnContactItemClickListener;
+import com.mottc.coze.main.GroupFragment.OnGroupItemListener;
 
 import java.util.List;
 
 /**
  * Created with Android Studio
  * User: mottc
- * Date: 2017/3/3
- * Time: 16:37
+ * Date: 2017/3/6
+ * Time: 21:03
  */
-public class ContactRecyclerViewAdapter extends RecyclerView.Adapter<ContactRecyclerViewAdapter.ViewHolder> {
+public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecyclerViewAdapter.ViewHolder> {
 
-    private final List<CozeUser> mValues;
-    private final OnContactItemClickListener mListener;
+    private final List<EMGroup> mValues;
+    private final OnGroupItemListener mListener;
 
-    public ContactRecyclerViewAdapter(List<CozeUser> items, OnContactItemClickListener listener) {
+    public GroupRecyclerViewAdapter(List<EMGroup> items, OnGroupItemListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -39,20 +39,14 @@ public class ContactRecyclerViewAdapter extends RecyclerView.Adapter<ContactRecy
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        String nickName = mValues.get(position).getNickName();
-        if (nickName != null) {
-            holder.mUserName.setText(nickName);
-        } else {
-            holder.mUserName.setText(mValues.get(position).getUserName());
-        }
-
+        holder.mUserName.setText(mValues.get(position).getGroupName());
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onContactItemClick(holder.mItem);
+                    mListener.onGroupItemClick(holder.mItem);
                 }
             }
         });
@@ -67,7 +61,7 @@ public class ContactRecyclerViewAdapter extends RecyclerView.Adapter<ContactRecy
         public final View mView;
         public final ImageView mAvatar;
         public final TextView mUserName;
-        public CozeUser mItem;
+        public EMGroup mItem;
 
         public ViewHolder(View view) {
             super(view);
@@ -78,4 +72,3 @@ public class ContactRecyclerViewAdapter extends RecyclerView.Adapter<ContactRecy
 
     }
 }
-

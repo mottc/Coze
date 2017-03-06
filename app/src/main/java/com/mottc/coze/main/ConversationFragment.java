@@ -62,7 +62,7 @@ public class ConversationFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_conversation, container, false);
 
-        mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) view.findViewById(R.id.main_swipe);
+        mWaveSwipeRefreshLayout = (WaveSwipeRefreshLayout) view.findViewById(R.id.conversation_swipe);
         mWaveSwipeRefreshLayout.setWaveRGBColor(63, 81, 181);
         mWaveSwipeRefreshLayout.setColorSchemeColors(Color.WHITE);
         mWaveSwipeRefreshLayout.setOnRefreshListener(new WaveSwipeRefreshLayout.OnRefreshListener() {
@@ -160,7 +160,6 @@ public class ConversationFragment extends Fragment {
         protected String[] doInBackground(Void... params) {
             EMClient.getInstance().chatManager().loadAllConversations();
             conversationList.clear();
-            conversationList.addAll(loadConversationList());
 
 //          使刷新动画展示完全，阻塞线程一秒
             try {
@@ -174,6 +173,7 @@ public class ConversationFragment extends Fragment {
         @Override
         protected void onPostExecute(String[] result) {
             // Call setRefreshing(false) when the list has been refreshed.
+            conversationList.addAll(loadConversationList());
             mConversationRecyclerViewAdapter.notifyDataSetChanged();
             mWaveSwipeRefreshLayout.setRefreshing(false);
             super.onPostExecute(result);
@@ -181,7 +181,6 @@ public class ConversationFragment extends Fragment {
     }
 
     public interface OnConversationItemClickListener {
-        // TODO: Update argument type and name
         void onConversationItemClick(EMConversation item);
     }
 }

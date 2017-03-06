@@ -40,6 +40,7 @@ public class ConversationRecyclerViewAdapter extends RecyclerView.Adapter<Conver
         return new ViewHolder(view);
     }
 
+
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
 
@@ -51,11 +52,14 @@ public class ConversationRecyclerViewAdapter extends RecyclerView.Adapter<Conver
             holder.mUsername.setText(groupName);
             holder.mIsGroup.setVisibility(View.VISIBLE);
 //            GroupAvatarUtils.setAvatar(mContext, groupId, holder.mIcon);
+            String userName = mValues.get(position).getLastMessage().getUserName()+":";
+            setContent(holder, position, userName);
 //
         } else {
             holder.mUsername.setText(conversationId);
 //            PersonAvatarUtils.setAvatar(mContext, mValues.get(position).getUserName(), holder.mIcon);
 //             AvatarURLDownloadUtils.downLoad(mValues.get(position).getUserName(), mContext, holder.mIcon,false);
+            setContent(holder, position, "");
 
         }
 
@@ -67,19 +71,7 @@ public class ConversationRecyclerViewAdapter extends RecyclerView.Adapter<Conver
             holder.mUnread.setVisibility(View.VISIBLE);
             holder.mUnread.setText(String.valueOf(unread));
         }
-        if (mValues.get(position).getLastMessage().getType().equals(EMMessage.Type.TXT)) {
-            String msg = mValues.get(position).getLastMessage().getBody().toString();
-            int start = msg.indexOf("txt:\"");
-            int end = msg.lastIndexOf("\"");
-            msg = msg.substring((start + 5), end);
-            holder.mContent.setText(msg);
-        } else if (mValues.get(position).getLastMessage().getType().equals(EMMessage.Type.IMAGE)) {
-            holder.mContent.setText("[图片]");
-        } else if (mValues.get(position).getLastMessage().getType().equals(EMMessage.Type.VOICE)) {
-            holder.mContent.setText("[语音]");
-        } else {
-            holder.mContent.setText("···");
-        }
+
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,6 +83,23 @@ public class ConversationRecyclerViewAdapter extends RecyclerView.Adapter<Conver
             }
         });
     }
+
+    public void setContent(ViewHolder holder, int position, String userName) {
+        if (mValues.get(position).getLastMessage().getType().equals(EMMessage.Type.TXT)) {
+            String msg = mValues.get(position).getLastMessage().getBody().toString();
+            int start = msg.indexOf("txt:\"");
+            int end = msg.lastIndexOf("\"");
+            msg = msg.substring((start + 5), end);
+            holder.mContent.setText(String.format("%s%s", userName, msg));
+        } else if (mValues.get(position).getLastMessage().getType().equals(EMMessage.Type.IMAGE)) {
+            holder.mContent.setText(String.format("%s[图片]", userName));
+        } else if (mValues.get(position).getLastMessage().getType().equals(EMMessage.Type.VOICE)) {
+            holder.mContent.setText(String.format("%s[语音]", userName));
+        } else {
+            holder.mContent.setText(String.format("%s···", userName));
+        }
+    }
+
 
     @Override
     public int getItemCount() {
