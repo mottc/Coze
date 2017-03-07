@@ -1,6 +1,7 @@
 package com.mottc.coze.main;
 
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -18,9 +19,12 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
 import com.mottc.coze.Constant;
+import com.mottc.coze.CozeApplication;
 import com.mottc.coze.R;
+import com.mottc.coze.login.LoginActivity;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -47,10 +51,17 @@ public class MenuListFragment extends Fragment {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 int id = menuItem.getItemId();
-                if (id == R.id.menu_feed) {
 
-                    Toast.makeText(getActivity(), "feed", Toast.LENGTH_SHORT).show();
+                switch (id) {
+                    case R.id.menu_change:
+                        logout();
+                        break;
+                    case R.id.menu_feed:
+                        Toast.makeText(getActivity(), "feed", Toast.LENGTH_SHORT).show();
+                        break;
+
                 }
+
                 return false;
             }
         });
@@ -58,15 +69,28 @@ public class MenuListFragment extends Fragment {
         return view;
     }
 
+    private void logout() {
+        CozeApplication.getInstance().logout(true, new EMCallBack() {
+            @Override
+            public void onSuccess() {
+                getActivity().finish();
+                startActivity(new Intent(getActivity(), LoginActivity.class));
+            }
+
+            @Override
+            public void onError(int code, String error) {
+
+                Toast.makeText(getActivity(), R.string.try_again, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onProgress(int progress, String status) {
+
+            }
+        });
+    }
+
     private void setupHeader() {
-
-//        Glide
-//                .with(getActivity())
-//                .load("www")
-//                .error(R.drawable.coze_logo)
-//                .centerCrop()
-//                .into(user_photo);
-
 
         Glide
                 .with(getActivity())

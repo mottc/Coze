@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -48,12 +47,6 @@ public class ContactFragment extends Fragment {
     public static ContactFragment newInstance() {
         ContactFragment fragment = new ContactFragment();
         return fragment;
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
     }
 
     @Override
@@ -155,6 +148,6 @@ public class ContactFragment extends Fragment {
     }
 
     public interface OnContactItemClickListener {
-        void onContactItemClick(CozeUser item);
+        void onContactItemClick(CozeUser item,View view);
     }
 }

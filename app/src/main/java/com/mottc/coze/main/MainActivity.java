@@ -1,5 +1,7 @@
 package com.mottc.coze.main;
 
+import android.app.ActivityOptions;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
@@ -7,12 +9,14 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.Toast;
 
+import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMConversation;
 import com.hyphenate.chat.EMGroup;
+import com.mottc.coze.Constant;
 import com.mottc.coze.R;
 import com.mottc.coze.bean.CozeUser;
+import com.mottc.coze.chat.ChatActivity;
 import com.mxn.soul.flowingdrawer_core.FlowingDrawer;
 
 import butterknife.BindView;
@@ -20,8 +24,8 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity
         implements ContactFragment.OnContactItemClickListener,
-                   ConversationFragment.OnConversationItemClickListener,
-                   GroupFragment.OnGroupItemListener{
+        ConversationFragment.OnConversationItemClickListener,
+        GroupFragment.OnGroupItemListener {
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
     @BindView(R.id.tabLayout)
@@ -30,6 +34,8 @@ public class MainActivity extends AppCompatActivity
     ViewPager mViewpager;
     @BindView(R.id.drawer_layout)
     FlowingDrawer mDrawerLayout;
+
+    private CozeConnectionListener mCozeConnectionListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,12 +46,14 @@ public class MainActivity extends AppCompatActivity
         setupToolbar();
         setupMenu();
         setupViewpager();
+        //注册一个监听连接状态的listener
+        mCozeConnectionListener = new CozeConnectionListener(this);
+        EMClient.getInstance().addConnectionListener(mCozeConnectionListener);
 
     }
 
     private void setupToolbar() {
         setSupportActionBar(mToolbar);
-        mToolbar.isTitleTruncated();
         mToolbar.setTitle("Coze");
         mToolbar.setNavigationIcon(R.drawable.ic_navigation);
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -64,6 +72,7 @@ public class MainActivity extends AppCompatActivity
             fm.beginTransaction().add(R.id.id_container_menu, mMenuFragment).commit();
         }
     }
+
     private void setupViewpager() {
 
 
@@ -82,6 +91,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EMClient.getInstance().removeConnectionListener(mCozeConnectionListener);
+    }
+
+    @Override
     public void onBackPressed() {
         if (mDrawerLayout.isMenuVisible()) {
             mDrawerLayout.closeMenu();
@@ -92,18 +107,31 @@ public class MainActivity extends AppCompatActivity
 
 
     @Override
-    public void onContactItemClick(CozeUser item) {
-
+    public void onContactItemClick(CozeUser item, View view) {
+        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(MainActivity.this, view, "chatToUserName");
+        Intent intent = new Intent(this, ChatActivity.class);
+        intent.putExtra("toUsername", item.getUserName()).putExtra("chat_type", Constant.USER);
+        startActivity(intent, options.toBundle());
     }
 
     @Override
-    public void onGroupItemClick(EMGroup item) {
-
+    public void onGroupItemClick(EMGroup item, View view) {
+        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(MainActivity.this, view, "chatToUserName");
+        Intent intent = new Intent(this, ChatActivity.class);
+        intent.putExtra("toUsername", item.getGroupId()).putExtra("chat_type", Constant.GROUP);
+        startActivity(intent, options.toBundle());
     }
 
     @Override
-    public void onConversationItemClick(EMConversation item) {
+    public void onConversationItemClick(EMConversation item, View view) {
 
-        Toast.makeText(this, "对话被点击", Toast.LENGTH_LONG).show();
+        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(MainActivity.this, view, "chatToUserName");
+        Intent intent = new Intent(this, ChatActivity.class);
+        if (item.isGroup()) {
+            intent.putExtra("toUsername", item.conversationId()).putExtra("chat_type", Constant.GROUP);
+        } else {
+            intent.putExtra("toUsername", item.conversationId()).putExtra("chat_type", Constant.USER);
+        }
+        startActivity(intent, options.toBundle());
     }
 }

@@ -11,5 +11,10 @@
     <string name="illegal_user_name">用户名只能是小写字母或数字</string>
     <string name="registration_failed">注册失败</string>
     <string name="group">(群)</string>
+    <string name="user_removed">账号已经被移除</string>
+    <string name="user_login_another_device">账号在其它设备登录</string>
+    <string name="can_not_connect">连接不到服务器</string>
+    <string name="change_user">切换用户</string>
+    <string name="try_again">请重试</string>
 
 </resources>

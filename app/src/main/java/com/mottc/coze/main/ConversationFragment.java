@@ -181,6 +181,6 @@ public class ConversationFragment extends Fragment {
     }
 
     public interface OnConversationItemClickListener {
-        void onConversationItemClick(EMConversation item);
+        void onConversationItemClick(EMConversation item,View view);
     }
 }

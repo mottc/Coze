@@ -12,4 +12,6 @@ public class Constant {
 
 
     public static final String KEY_USERNAME = "local_username";
+    public static final int USER = 1;
+    public static final int GROUP = 2;
 }

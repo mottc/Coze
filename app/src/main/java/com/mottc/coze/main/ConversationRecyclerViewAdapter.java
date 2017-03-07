@@ -78,7 +78,7 @@ public class ConversationRecyclerViewAdapter extends RecyclerView.Adapter<Conver
             public void onClick(View v) {
                 if (null != mListener) {
 
-                    mListener.onConversationItemClick(holder.mItem);
+                    mListener.onConversationItemClick(holder.mItem,holder.mUsername);
                 }
             }
         });

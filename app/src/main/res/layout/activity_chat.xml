@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:id="@+id/chat_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/chat_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:theme="@style/AppTheme.AppBarOverlay"
+        app:elevation="0dp"
+        >
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/chat_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            >
+            <TextView
+                android:id="@+id/talkTo"
+                android:transitionName="chatToUserName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18dp"
+                android:textColor="@android:color/white"/>
+        </android.support.v7.widget.Toolbar>
+    </android.support.design.widget.AppBarLayout>
+
+    <RelativeLayout
+        android:id="@+id/input_layout"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/white"
+        >
+        <ImageButton
+            android:id="@+id/send"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="5dp"
+            android:background="@drawable/send"/>
+        <ImageButton
+            android:id="@+id/add"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="5dp"
+            android:background="@drawable/add"/>
+
+        <EditText
+            android:id="@+id/text_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:hint="请输入内容"
+            android:textSize="18sp"
+            android:layout_toLeftOf="@id/send"
+            android:layout_toRightOf="@id/add"/>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/add_choose"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:gravity="center_vertical"
+        android:visibility="gone"
+        android:background="@android:color/white"
+        android:layout_alignParentBottom="true">
+
+        <ImageButton
+            android:id="@+id/remove"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="#0000"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/remove"/>
+
+        <ImageButton
+            android:id="@+id/image"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="#0000"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/image"/>
+        <ImageButton
+            android:id="@+id/voice"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="#0000"
+            android:src="@drawable/voice"/>
+        <ImageButton
+            android:id="@+id/camera"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="#0000"
+            android:src="@drawable/camera"/>
+        <ImageButton
+            android:id="@+id/phone"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="#0000"
+            android:src="@drawable/phone"/>
+        <ImageButton
+            android:id="@+id/video"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="#0000"
+            android:src="@drawable/video"/>
+
+    </LinearLayout>
+
+
+    <android.support.v7.widget.RecyclerView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/chat_recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layoutManager="LinearLayoutManager"
+        android:layout_above="@id/input_layout"
+        android:layout_below="@id/chat_bar"
+        android:background="@android:color/black"
+        tools:context="com.mottc.coze.main.ChatActivity"
+        >
+
+    </android.support.v7.widget.RecyclerView>
+
+</RelativeLayout>

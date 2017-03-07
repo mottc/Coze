@@ -2,13 +2,13 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="70dp">
+    android:layout_height="56dp">
 
     <ImageView
         android:id="@+id/avatar"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_margin="5dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_margin="3dp"
         android:scaleType="centerCrop"/>
 
     <TextView
@@ -17,7 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:layout_margin="5dp"
+        android:layout_margin="3dp"
         android:textColor="#444"/>
 
     <TextView
@@ -26,7 +26,6 @@
         android:layout_height="20dp"
         android:layout_alignBottom="@id/avatar"
         android:layout_alignParentEnd="true"
-        android:layout_marginBottom="3dp"
         android:layout_marginRight="5dp"
         android:background="@drawable/unread_count_bg"
         android:gravity="center"
@@ -34,9 +33,10 @@
 
     <TextView
         android:id="@+id/userName"
+        android:transitionName="chatToUserName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
+        android:layout_margin="3dp"
         android:layout_toRightOf="@id/avatar"
         android:textColor="#000"
         android:textSize="20sp"/>
@@ -45,7 +45,7 @@
         android:id="@+id/isGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="5dp"
         android:layout_toRightOf="@id/userName"
         android:text="@string/group"
         android:textColor="@color/colorAccent"
@@ -56,8 +56,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@id/avatar"
-        android:layout_marginBottom="3dp"
-        android:layout_marginLeft="5dp"
+        android:layout_marginLeft="3dp"
         android:layout_marginRight="5dp"
         android:layout_toLeftOf="@id/unread_num"
         android:layout_toRightOf="@id/avatar"

@@ -67,7 +67,7 @@ public class GroupFragment extends Fragment {
                 new GroupRefreshTask().execute();
             }
         });
-        // Set the adapter
+
         View recyclerView = view.findViewById(R.id.contact_list);
         // Set the adapter
         if (recyclerView instanceof RecyclerView) {
@@ -134,6 +134,6 @@ public class GroupFragment extends Fragment {
 
 
     public interface OnGroupItemListener {
-        void onGroupItemClick(EMGroup item);
+        void onGroupItemClick(EMGroup item,View view);
     }
 }
