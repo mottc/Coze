@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -74,6 +75,7 @@ public class GroupFragment extends Fragment {
             Context context = view.getContext();
             mRecyclerView = (RecyclerView) recyclerView;
             mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
+            mRecyclerView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
             mGroupRecyclerViewAdapter = new GroupRecyclerViewAdapter(groupList, mListener);
             mRecyclerView.setAdapter(mGroupRecyclerViewAdapter);
         }

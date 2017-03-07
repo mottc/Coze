@@ -2,6 +2,7 @@ package com.mottc.coze.chat;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -12,7 +13,13 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.hyphenate.chat.EMClient;
+import com.hyphenate.chat.EMConversation;
+import com.hyphenate.chat.EMMessage;
+import com.mottc.coze.Constant;
 import com.mottc.coze.R;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -51,22 +58,37 @@ public class ChatActivity extends AppCompatActivity {
     @BindView(R.id.talkTo)
     TextView mTalkTo;
 
-    private String toUsername;
+    private String toChatUsername;
     private int chat_type;
+    private List<EMMessage> messages;
+    private ChatAdapter mChatAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
         ButterKnife.bind(this);
-        setupChatToolbar();
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE | WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        toChatUsername = this.getIntent().getStringExtra("username");
+        chat_type = this.getIntent().getIntExtra("type", Constant.USER);
+        initView();
+        getMsg();
+        mChatAdapter = new ChatAdapter(messages);
+        mChatRecyclerView.setAdapter(mChatAdapter);
+
     }
 
-    private void setupChatToolbar() {
+    private void getMsg() {
+        EMConversation conversation = EMClient.getInstance().chatManager().getConversation(toChatUsername);
+//      获取此会话的所有消息
+        messages = conversation.getAllMessages();
+        conversation.markAllMessagesAsRead();
+    }
 
+    private void initView() {
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE | WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        mChatRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mChatToolbar.setTitle("");
-        mTalkTo.setText("mottc");
+        mTalkTo.setText(toChatUsername);
         setSupportActionBar(mChatToolbar);
         mChatToolbar.setNavigationIcon(R.drawable.back);
         mChatToolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -77,6 +99,8 @@ public class ChatActivity extends AppCompatActivity {
         });
 
     }
+
+
 
     @OnClick({R.id.image, R.id.voice, R.id.camera, R.id.phone, R.id.video, R.id.send, R.id.add, R.id.chat_content, R.id.remove})
     public void onClick(View view) {

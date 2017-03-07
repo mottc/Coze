@@ -63,8 +63,4 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:textSize="16sp"/>
-
-    <include
-        layout="@layout/separator"/>
-
 </RelativeLayout>

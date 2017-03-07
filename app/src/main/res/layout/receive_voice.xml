@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/timestamp"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/tv_userName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="3dp"
+            android:maxLines="1"/>
+
+        <ImageView
+            android:id="@+id/iv_userAvatar"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/tv_userName"
+            android:layout_marginLeft="3dp"
+            android:scaleType="centerInside"/>
+
+        <RelativeLayout
+            android:id="@+id/bubble"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@id/iv_userAvatar"
+            android:layout_alignTop="@id/iv_userAvatar"
+            android:background="@drawable/bg_incoming_message"
+            >
+
+            <ProgressBar
+                android:id="@+id/iv_voice"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                style="?android:attr/progressBarStyleHorizontal"/>
+            <TextView
+                android:id="@+id/tv_length"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/iv_voice"
+                android:layout_marginLeft="5dp"
+                tools:ignore="HardcodedText"/>
+            <ImageView
+                android:id="@+id/unread_dot"
+                android:layout_width="5dp"
+                android:layout_height="5dp"
+                android:layout_below="@id/iv_voice"
+                android:layout_marginLeft="5dp"
+                android:layout_toRightOf="@id/tv_length"
+                android:src="@drawable/unread_count_bg"
+                android:visibility="visible"/>
+        </RelativeLayout>
+
+
+
+    </RelativeLayout>
+
+</LinearLayout>
