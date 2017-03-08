@@ -9,6 +9,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -22,7 +25,15 @@ import com.mottc.coze.Constant;
 import com.mottc.coze.R;
 import com.mottc.coze.bean.CozeUser;
 import com.mottc.coze.chat.ChatActivity;
+import com.mottc.coze.splash.SplashActivity;
 import com.mxn.soul.flowingdrawer_core.FlowingDrawer;
+import com.yalantis.contextmenu.lib.ContextMenuDialogFragment;
+import com.yalantis.contextmenu.lib.MenuObject;
+import com.yalantis.contextmenu.lib.MenuParams;
+import com.yalantis.contextmenu.lib.interfaces.OnMenuItemClickListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -40,17 +51,23 @@ public class MainActivity extends AppCompatActivity
     @BindView(R.id.drawer_layout)
     FlowingDrawer mDrawerLayout;
 
+
     private CozeConnectionListener mCozeConnectionListener;
+    private ContextMenuDialogFragment mMenuDialogFragment;
+    private FragmentManager fragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        fragmentManager = getSupportFragmentManager();
 
         setupToolbar();
         setupMenu();
+        initMenuFragment();
         setupViewpager();
+
         //注册一个监听连接状态的listener
         mCozeConnectionListener = new CozeConnectionListener(this);
         EMClient.getInstance().addConnectionListener(mCozeConnectionListener);
@@ -78,6 +95,54 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private void initMenuFragment() {
+        MenuParams menuParams = new MenuParams();
+        menuParams.setActionBarSize(200);
+        menuParams.setMenuObjects(getMenuObjects());
+        menuParams.setClosableOutside(false);
+        mMenuDialogFragment = ContextMenuDialogFragment.newInstance(menuParams);
+        mMenuDialogFragment.setItemClickListener(new OnMenuItemClickListener() {
+            @Override
+            public void onMenuItemClick(View clickedView, int position) {
+//                Toast.makeText(getParent(), String.valueOf(position), Toast.LENGTH_SHORT).show();
+
+                startActivity(new Intent(MainActivity.this, SplashActivity.class));
+            }
+        });
+    }
+
+    private List<MenuObject> getMenuObjects() {
+
+        List<MenuObject> menuObjects = new ArrayList<>();
+
+        MenuObject close = new MenuObject();
+        close.setBgResource(R.color.colorPrimary);
+        close.setResource(R.drawable.cancel);
+
+        MenuObject add_friend = new MenuObject("添加好友");
+        add_friend.setBgResource(R.color.colorPrimary);
+        add_friend.setResource(R.drawable.person_add);
+
+        MenuObject add_group = new MenuObject("加入群组");
+        add_group.setBgResource(R.color.colorPrimary);
+        add_group.setResource(R.drawable.group_add);
+
+        MenuObject create_group = new MenuObject("创建群组");
+        create_group.setBgResource(R.color.colorPrimary);
+        create_group.setResource(R.drawable.group);
+
+        MenuObject notification = new MenuObject("查看通知");
+        notification.setBgResource(R.color.colorPrimary);
+        notification.setResource(R.drawable.notifications);
+
+        menuObjects.add(close);
+        menuObjects.add(add_friend);
+        menuObjects.add(add_group);
+        menuObjects.add(create_group);
+        menuObjects.add(notification);
+        return menuObjects;
+    }
+
     private void setupViewpager() {
 
 
@@ -95,6 +160,26 @@ public class MainActivity extends AppCompatActivity
         mTabLayout.setupWithViewPager(mViewpager);
     }
 
+
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.context_menu:
+                if (fragmentManager.findFragmentByTag(ContextMenuDialogFragment.TAG) == null) {
+                    mMenuDialogFragment.show(fragmentManager, ContextMenuDialogFragment.TAG);
+                }
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -109,7 +194,6 @@ public class MainActivity extends AppCompatActivity
             super.onBackPressed();
         }
     }
-
 
 
     @Override
@@ -140,8 +224,6 @@ public class MainActivity extends AppCompatActivity
         }
         startActivity(intent, options.toBundle());
     }
-
-
 
 
     private class CozeConnectionListener implements EMConnectionListener {

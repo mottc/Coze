@@ -40,7 +40,7 @@ public class MenuListFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        View view = inflater.inflate(R.layout.fragment_menu, container, false);
+        View view = inflater.inflate(R.layout.fragment_navigation_menu, container, false);
 
         NavigationView vNavigation = (NavigationView) view.findViewById(R.id.vNavigation);
         View headerLayout = vNavigation.getHeaderView(0);

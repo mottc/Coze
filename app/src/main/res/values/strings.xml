@@ -16,5 +16,6 @@
     <string name="can_not_connect">连接不到服务器</string>
     <string name="change_user">切换用户</string>
     <string name="try_again">请重试</string>
+    <string name="context_menu">菜单</string>
 
 </resources>
