@@ -52,11 +52,12 @@ public class ConversationRecyclerViewAdapter extends RecyclerView.Adapter<Conver
             holder.mUsername.setText(groupName);
             holder.mIsGroup.setVisibility(View.VISIBLE);
 //            GroupAvatarUtils.setAvatar(mContext, groupId, holder.mIcon);
-            String userName = mValues.get(position).getLastMessage().getUserName()+":";
+            String userName = mValues.get(position).getLastMessage().getFrom()+":";
             setContent(holder, position, userName);
 //
         } else {
             holder.mUsername.setText(conversationId);
+            holder.mIsGroup.setVisibility(View.GONE);
 //            PersonAvatarUtils.setAvatar(mContext, mValues.get(position).getUserName(), holder.mIcon);
 //             AvatarURLDownloadUtils.downLoad(mValues.get(position).getUserName(), mContext, holder.mIcon,false);
             setContent(holder, position, "");

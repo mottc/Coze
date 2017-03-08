@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_horizontal"
+    android:layout_marginTop="3dp"
     android:orientation="vertical">
 
     <TextView
@@ -22,7 +23,7 @@
         android:background="@drawable/bg_outcoming_message"
         android:gravity="right|center"
         android:lineSpacingExtra="2dp"
-        android:maxWidth="225dp"
+        android:maxWidth="260dp"
         android:textSize="15sp"/>
 
 

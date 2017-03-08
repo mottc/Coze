@@ -14,8 +14,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.hyphenate.EMMessageListener;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMConversation;
+import com.hyphenate.chat.EMMessage;
 import com.mottc.coze.R;
 
 import java.util.ArrayList;
@@ -42,7 +44,6 @@ public class ConversationFragment extends Fragment {
 
     public ConversationFragment() {
     }
-
 
     @SuppressWarnings("unused")
     public static ConversationFragment newInstance() {
@@ -86,6 +87,12 @@ public class ConversationFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EMClient.getInstance().chatManager().addMessageListener(msgListener);
+
+    }
 
     @Override
     public void onAttach(Context context) {
@@ -104,6 +111,11 @@ public class ConversationFragment extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateConversationList();
+    }
 
     protected List<EMConversation> loadConversationList() {
         // get all conversations
@@ -155,13 +167,49 @@ public class ConversationFragment extends Fragment {
         });
     }
 
+    private void updateConversationList() {
+        conversationList.clear();
+        conversationList.addAll(loadConversationList());
+        mConversationRecyclerViewAdapter.notifyDataSetChanged();
+    }
+
+
+    EMMessageListener msgListener = new EMMessageListener() {
+
+        @Override
+        public void onMessageReceived(List<EMMessage> list) {
+
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    updateConversationList();
+                }
+            });
+        }
+
+        @Override
+        public void onCmdMessageReceived(List<EMMessage> list) {
+        }
+
+        @Override
+        public void onMessageRead(List<EMMessage> messages) {
+        }
+
+        @Override
+        public void onMessageDelivered(List<EMMessage> messages) {
+        }
+
+        @Override
+        public void onMessageChanged(EMMessage emMessage, Object o){
+        }
+    };
 
     private class ConversationRefreshTask extends AsyncTask<Void, Void, String[]> {
 
         @Override
         protected String[] doInBackground(Void... params) {
             EMClient.getInstance().chatManager().loadAllConversations();
-            conversationList.clear();
+
 
 //          使刷新动画展示完全，阻塞线程一秒
             try {
@@ -175,8 +223,7 @@ public class ConversationFragment extends Fragment {
         @Override
         protected void onPostExecute(String[] result) {
             // Call setRefreshing(false) when the list has been refreshed.
-            conversationList.addAll(loadConversationList());
-            mConversationRecyclerViewAdapter.notifyDataSetChanged();
+            updateConversationList();
             mWaveSwipeRefreshLayout.setRefreshing(false);
             super.onPostExecute(result);
         }

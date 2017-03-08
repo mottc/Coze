@@ -4,6 +4,9 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import com.hyphenate.chat.EMConversation;
+import com.mottc.coze.Constant;
+
 /**
  * Created with Android Studio
  * User: mottc
@@ -21,6 +24,20 @@ public class CommonUtils {
             }
         }
         return false;
+    }
+
+
+    /**
+     * 将应用的会话类型转化为SDK的会话类型
+     */
+    public static EMConversation.EMConversationType getConversationType(int chatType) {
+        if (chatType == Constant.USER) {
+            return EMConversation.EMConversationType.Chat;
+        } else if (chatType == Constant.GROUP) {
+            return EMConversation.EMConversationType.GroupChat;
+        } else {
+            return EMConversation.EMConversationType.ChatRoom;
+        }
     }
 
 }

@@ -16,6 +16,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
         >
         <TextView
             android:id="@+id/tv_userName"
@@ -43,7 +44,7 @@
             android:background="@drawable/bg_incoming_message"
             android:gravity="left|center"
             android:lineSpacingExtra="2dp"
-            android:maxWidth="225dp"
+            android:maxWidth="260dp"
             android:textColor="#ff000000"/>
 
 

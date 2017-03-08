@@ -152,8 +152,8 @@
         app:layoutManager="LinearLayoutManager"
         android:layout_above="@id/input_layout"
         android:layout_below="@id/chat_bar"
-        android:background="@android:color/black"
         tools:context="com.mottc.coze.main.ChatActivity"
+        android:paddingBottom="3dp"
         >
 
     </android.support.v7.widget.RecyclerView>
