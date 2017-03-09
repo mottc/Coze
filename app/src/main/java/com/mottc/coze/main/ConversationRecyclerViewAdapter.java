@@ -51,13 +51,14 @@ public class ConversationRecyclerViewAdapter extends RecyclerView.Adapter<Conver
         holder.mItem = mValues.get(position);
         String conversationId = mValues.get(position).conversationId();
         if (mValues.get(position).isGroup()) {
-
             String groupName = EMClient.getInstance().groupManager().getGroup(conversationId).getGroupName();
             holder.mUsername.setText(groupName);
             holder.mIsGroup.setVisibility(View.VISIBLE);
             String userName = mValues.get(position).getLastMessage().getFrom() + ":";
             setContent(holder, position, userName);
         } else {
+//            TODO:
+//            String nickname = CommonUtils.getNickName(conversationId);
             holder.mUsername.setText(conversationId);
             holder.mIsGroup.setVisibility(View.GONE);
             setContent(holder, position, "");

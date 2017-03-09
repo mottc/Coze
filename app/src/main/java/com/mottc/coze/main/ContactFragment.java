@@ -102,6 +102,12 @@ public class ContactFragment extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        getContactList();
+        mContactRecyclerViewAdapter.notifyDataSetChanged();
+    }
 
     /**
      * 获取联系人列表

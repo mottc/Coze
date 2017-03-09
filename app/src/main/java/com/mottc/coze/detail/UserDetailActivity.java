@@ -123,6 +123,11 @@ public class UserDetailActivity extends AppCompatActivity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_change_nickname:
+//                TODO
+//                Long id = CommonUtils.getCozeUserFromDB(username).getId();
+//                CozeUser cozeUser = new CozeUser(id, username, "zhangsan", null);
+//                CozeApplication.getInstance().getDaoSession(EMClient.getInstance().getCurrentUser())
+//                        .getCozeUserDao().update(cozeUser);
                 break;
             case R.id.btn_send_msg:
                 break;

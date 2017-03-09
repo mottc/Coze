@@ -44,13 +44,14 @@ public class ContactRecyclerViewAdapter extends RecyclerView.Adapter<ContactRecy
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
         String nickName = mValues.get(position).getNickName();
+        String username = mValues.get(position).getUserName();
         if (nickName != null) {
             holder.mUserName.setText(nickName);
         } else {
-            holder.mUserName.setText(mValues.get(position).getUserName());
+            holder.mUserName.setText(username);
         }
 
-        AvatarUtils.setAvatar(context,mValues.get(position).getUserName(),holder.mAvatar);
+        AvatarUtils.setAvatar(context,username,holder.mAvatar);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override

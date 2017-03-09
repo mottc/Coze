@@ -105,6 +105,7 @@ public class ChatActivity extends AppCompatActivity {
             String groupName = EMClient.getInstance().groupManager().getGroup(toChatUsername).getGroupName();
             mTalkTo.setText(groupName);
         } else {
+//            String nickname = CommonUtils.getNickName(toChatUsername);
             mTalkTo.setText(toChatUsername);
         }
         setSupportActionBar(mChatToolbar);
