@@ -61,7 +61,7 @@ public class LoginActivity extends AppCompatActivity {
         findViewById(R.id.login_layout).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
             }
         });
@@ -109,7 +109,7 @@ public class LoginActivity extends AppCompatActivity {
                 CozeApplication.getInstance().setCurrentUserName(loginUserName);
                 // close it before login to make sure DemoDB not overlap
 
-                DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), loginUserName+".db");
+                DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(getApplicationContext(), loginUserName + ".db");
                 Database db = helper.getWritableDb();
                 helper.close();
                 db.close();
@@ -125,7 +125,11 @@ public class LoginActivity extends AppCompatActivity {
                         }
 
                         // 第一次登录或者之前logout后再登录，加载所有本地群和回话
-
+                        try {
+                            EMClient.getInstance().groupManager().getJoinedGroupsFromServer();
+                        } catch (HyphenateException e) {
+                            e.printStackTrace();
+                        }
                         EMClient.getInstance().groupManager().loadAllGroups();
                         EMClient.getInstance().chatManager().loadAllConversations();
                         getFriends();

@@ -25,7 +25,6 @@ import com.mottc.coze.Constant;
 import com.mottc.coze.R;
 import com.mottc.coze.bean.CozeUser;
 import com.mottc.coze.chat.ChatActivity;
-import com.mottc.coze.splash.SplashActivity;
 import com.mxn.soul.flowingdrawer_core.FlowingDrawer;
 import com.yalantis.contextmenu.lib.ContextMenuDialogFragment;
 import com.yalantis.contextmenu.lib.MenuObject;
@@ -104,9 +103,9 @@ public class MainActivity extends AppCompatActivity
         mMenuDialogFragment.setItemClickListener(new OnMenuItemClickListener() {
             @Override
             public void onMenuItemClick(View clickedView, int position) {
-//                Toast.makeText(getParent(), String.valueOf(position), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(Parent(), String.valueOf(position), Toast.LENGTH_SHORT).show();
+//TODO:
 
-                startActivity(new Intent(MainActivity.this, SplashActivity.class));
             }
         });
     }
@@ -119,19 +118,19 @@ public class MainActivity extends AppCompatActivity
         close.setBgResource(R.color.colorPrimary);
         close.setResource(R.drawable.cancel);
 
-        MenuObject add_friend = new MenuObject("添加好友");
+        MenuObject add_friend = new MenuObject(getString(R.string.add_friend));
         add_friend.setBgResource(R.color.colorPrimary);
         add_friend.setResource(R.drawable.person_add);
 
-        MenuObject add_group = new MenuObject("加入群组");
+        MenuObject add_group = new MenuObject(getString(R.string.add_group));
         add_group.setBgResource(R.color.colorPrimary);
         add_group.setResource(R.drawable.group_add);
 
-        MenuObject create_group = new MenuObject("创建群组");
+        MenuObject create_group = new MenuObject(getString(R.string.create_group));
         create_group.setBgResource(R.color.colorPrimary);
         create_group.setResource(R.drawable.group);
 
-        MenuObject notification = new MenuObject("查看通知");
+        MenuObject notification = new MenuObject(getString(R.string.notification));
         notification.setBgResource(R.color.colorPrimary);
         notification.setResource(R.drawable.notifications);
 

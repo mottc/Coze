@@ -27,12 +27,13 @@
 
         <ImageView
             android:id="@+id/iv_userAvatar"
+            android:transitionName="TransImage"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_below="@id/tv_userName"
             android:layout_marginStart="3dp"
             android:layout_marginRight="5dp"
-            android:scaleType="centerInside" />
+            android:scaleType="centerCrop" />
 
         <TextView
             android:id="@+id/tv_chatContent"

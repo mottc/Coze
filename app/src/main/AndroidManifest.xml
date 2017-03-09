@@ -74,6 +74,10 @@
             android:launchMode="singleTop"
             android:theme="@style/ChatActivityTheme">
         </activity>
+        <activity
+            android:name=".detail.UserDetailActivity"
+            android:theme="@style/MainTheme">
+        </activity>
     </application>
 
 </manifest>

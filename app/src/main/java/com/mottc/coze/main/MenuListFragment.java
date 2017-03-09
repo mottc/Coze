@@ -1,6 +1,7 @@
 package com.mottc.coze.main;
 
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import com.hyphenate.chat.EMClient;
 import com.mottc.coze.Constant;
 import com.mottc.coze.CozeApplication;
 import com.mottc.coze.R;
+import com.mottc.coze.detail.UserDetailActivity;
 import com.mottc.coze.login.LoginActivity;
 
 /**
@@ -46,6 +48,16 @@ public class MenuListFragment extends Fragment {
         View headerLayout = vNavigation.getHeaderView(0);
         user_photo = (ImageView) headerLayout.findViewById(R.id.userPhoto);
         user_name = (TextView) headerLayout.findViewById(R.id.userName);
+        headerLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(getActivity(), user_photo, "TransImage");
+                Intent intent = new Intent(getActivity(), UserDetailActivity.class);
+                intent.putExtra("username", EMClient.getInstance().getCurrentUser());
+                startActivity(intent, options.toBundle());
+            }
+        });
 
         vNavigation.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -53,11 +65,11 @@ public class MenuListFragment extends Fragment {
                 int id = menuItem.getItemId();
 
                 switch (id) {
-                    case R.id.menu_change:
+                    case R.id.drawer_change:
                         logout();
                         break;
-                    case R.id.menu_feed:
-                        Toast.makeText(getActivity(), "feed", Toast.LENGTH_SHORT).show();
+                    case R.id.drawer_add_friend:
+                        Toast.makeText(getActivity(), "add_f", Toast.LENGTH_SHORT).show();
                         break;
 
                 }
@@ -92,11 +104,13 @@ public class MenuListFragment extends Fragment {
 
     private void setupHeader() {
 
+
+        String currentUsername = EMClient.getInstance().getCurrentUser();
         Glide
                 .with(getActivity())
-                .load(Constant.SPLASH_URL)
+                .load(Constant.BASIC_URL + currentUsername + ".png")
                 .asBitmap()
-                .error(R.drawable.window_bg)
+                .error(R.drawable.default_avatar)
                 .centerCrop()
                 .into(new BitmapImageViewTarget(user_photo) {
                     @Override
@@ -108,7 +122,7 @@ public class MenuListFragment extends Fragment {
                     }
                 });
 
-        user_name.setText(EMClient.getInstance().getCurrentUser());
+        user_name.setText(currentUsername);
     }
 
 

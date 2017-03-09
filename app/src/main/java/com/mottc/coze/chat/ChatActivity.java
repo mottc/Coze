@@ -78,7 +78,7 @@ public class ChatActivity extends AppCompatActivity {
         messages = new ArrayList<>();
         initView();
         getMsg();
-        mChatAdapter = new ChatAdapter(messages, chat_type);
+        mChatAdapter = new ChatAdapter(messages, chat_type, this);
         mChatRecyclerView.setAdapter(mChatAdapter);
         mChatRecyclerView.scrollToPosition(messages.size() - 1);
         EMClient.getInstance().chatManager().addMessageListener(msgListener);
@@ -93,7 +93,9 @@ public class ChatActivity extends AppCompatActivity {
             public void onLayoutChange(View v, int left, int top, int right, int bottom,
                                        int oldLeft, int oldTop, int oldRight, int oldBottom) {
                 if (bottom < oldBottom) {
-                    mChatRecyclerView.smoothScrollToPosition(messages.size() - 1);
+                    if (messages.size() > 0) {
+                        mChatRecyclerView.smoothScrollToPosition(messages.size() - 1);
+                    }
                 }
 
             }
@@ -110,7 +112,7 @@ public class ChatActivity extends AppCompatActivity {
         mChatToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                ChatActivity.super.onBackPressed();
             }
         });
 
@@ -247,6 +249,7 @@ public class ChatActivity extends AppCompatActivity {
         super.onPause();
         conversation.markAllMessagesAsRead();
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();

@@ -1,5 +1,6 @@
 package com.mottc.coze.main;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import com.hyphenate.chat.EMMessage;
 import com.hyphenate.util.DateUtils;
 import com.mottc.coze.R;
 import com.mottc.coze.main.ConversationFragment.OnConversationItemClickListener;
+import com.mottc.coze.utils.AvatarUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -27,10 +29,12 @@ public class ConversationRecyclerViewAdapter extends RecyclerView.Adapter<Conver
 
     private final List<EMConversation> mValues;
     private final OnConversationItemClickListener mListener;
+    private Context context;
 
-    public ConversationRecyclerViewAdapter(List<EMConversation> items, OnConversationItemClickListener listener) {
+    public ConversationRecyclerViewAdapter(List<EMConversation> items, OnConversationItemClickListener listener, Context context) {
         mValues = items;
         mListener = listener;
+        this.context = context;
     }
 
     @Override
@@ -51,18 +55,15 @@ public class ConversationRecyclerViewAdapter extends RecyclerView.Adapter<Conver
             String groupName = EMClient.getInstance().groupManager().getGroup(conversationId).getGroupName();
             holder.mUsername.setText(groupName);
             holder.mIsGroup.setVisibility(View.VISIBLE);
-//            GroupAvatarUtils.setAvatar(mContext, groupId, holder.mIcon);
-            String userName = mValues.get(position).getLastMessage().getFrom()+":";
+            String userName = mValues.get(position).getLastMessage().getFrom() + ":";
             setContent(holder, position, userName);
-//
         } else {
             holder.mUsername.setText(conversationId);
             holder.mIsGroup.setVisibility(View.GONE);
-//            PersonAvatarUtils.setAvatar(mContext, mValues.get(position).getUserName(), holder.mIcon);
-//             AvatarURLDownloadUtils.downLoad(mValues.get(position).getUserName(), mContext, holder.mIcon,false);
             setContent(holder, position, "");
-
         }
+
+        AvatarUtils.setAvatar(context, conversationId, holder.mAvatar);
 
         holder.mTime.setText(DateUtils.getTimestampString(new Date(mValues.get(position).getLastMessage().getMsgTime())));
         int unread = mValues.get(position).getUnreadMsgCount();
@@ -79,7 +80,7 @@ public class ConversationRecyclerViewAdapter extends RecyclerView.Adapter<Conver
             public void onClick(View v) {
                 if (null != mListener) {
 
-                    mListener.onConversationItemClick(holder.mItem,holder.mUsername);
+                    mListener.onConversationItemClick(holder.mItem, holder.mUsername);
                 }
             }
         });

@@ -13,7 +13,9 @@
         android:layout_gravity="start"
         android:background="@android:color/transparent"
         app:headerLayout="@layout/menu_header"
-        app:itemIconTint="#8b8b8b"
-        app:itemTextColor="#666666"
+        app:itemIconTint="#88c"
+        app:itemTextColor="#333"
+        app:itemTextAppearance="@style/drawer_menu"
+
         app:menu="@menu/drawer_menu"/>
 </RelativeLayout>

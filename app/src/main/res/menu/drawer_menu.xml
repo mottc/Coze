@@ -2,30 +2,25 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:id="@+id/menu_group_1">
         <item
-            android:id="@+id/menu_feed"
-            android:title="My Feed" />
+            android:id="@+id/drawer_add_friend"
+            android:icon="@drawable/person_add"
+            android:title="@string/add_friend" />
         <item
-            android:id="@+id/menu_direct"
-            android:title="Instagram Direct" />
+            android:id="@+id/drawer_add_group"
+            android:icon="@drawable/group_add"
+            android:title="@string/add_group"/>
         <item
-            android:id="@+id/menu_news"
-            android:title="News" />
+            android:id="@+id/drawer_create_group"
+            android:icon="@drawable/group"
+            android:title="@string/create_group"/>
         <item
-            android:id="@+id/menu_popular"
-            android:title="Popular" />
+            android:id="@+id/drawer_notification"
+            android:icon="@drawable/notifications"
+            android:title="@string/notification"/>
         <item
-            android:id="@+id/menu_photos_nearby"
-            android:title="Photos Nearby" />
-        <item
-            android:id="@+id/menu_photo_you_liked"
-            android:title="Photos You've Liked" />
+            android:id="@+id/drawer_change"
+            android:icon="@drawable/change"
+            android:title="@string/change_user"/>
     </group>
-    <group android:id="@+id/menu_group_2">
-        <item
-            android:id="@+id/menu_settings"
-            android:title="Settings" />
-        <item
-            android:id="@+id/menu_change"
-            android:title="@string/change_user" />
-    </group>
+
 </menu>

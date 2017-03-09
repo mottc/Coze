@@ -81,7 +81,7 @@ public class ConversationFragment extends Fragment {
             RecyclerView mRecyclerView = (RecyclerView) recyclerView;
             mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
             mRecyclerView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
-            mConversationRecyclerViewAdapter = new ConversationRecyclerViewAdapter(conversationList, mListener);
+            mConversationRecyclerViewAdapter = new ConversationRecyclerViewAdapter(conversationList, mListener,getContext());
             mRecyclerView.setAdapter(mConversationRecyclerViewAdapter);
         }
         return view;

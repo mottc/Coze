@@ -76,7 +76,7 @@ public class GroupFragment extends Fragment {
             mRecyclerView = (RecyclerView) recyclerView;
             mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
             mRecyclerView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
-            mGroupRecyclerViewAdapter = new GroupRecyclerViewAdapter(groupList, mListener);
+            mGroupRecyclerViewAdapter = new GroupRecyclerViewAdapter(groupList, mListener,getContext());
             mRecyclerView.setAdapter(mGroupRecyclerViewAdapter);
         }
         return view;

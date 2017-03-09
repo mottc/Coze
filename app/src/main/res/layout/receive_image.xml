@@ -34,7 +34,7 @@
             android:layout_alignParentLeft="true"
             android:layout_below="@id/tv_userName"
             android:layout_marginLeft="3dp"
-            android:scaleType="centerInside"/>
+            android:scaleType="centerCrop"/>
 
         <RelativeLayout
             android:id="@+id/bubble"

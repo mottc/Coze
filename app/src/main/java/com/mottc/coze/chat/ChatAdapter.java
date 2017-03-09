@@ -1,5 +1,9 @@
 package com.mottc.coze.chat;
 
+import android.app.Activity;
+import android.app.ActivityOptions;
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +16,8 @@ import android.widget.TextView;
 import com.hyphenate.chat.EMMessage;
 import com.mottc.coze.Constant;
 import com.mottc.coze.R;
+import com.mottc.coze.detail.UserDetailActivity;
+import com.mottc.coze.utils.AvatarUtils;
 
 import java.util.List;
 
@@ -28,10 +34,12 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private final List<EMMessage> mValues;
     private int chat_type;
+    private Context context;
 
-    public ChatAdapter(List<EMMessage> values,int chat_type) {
+    public ChatAdapter(List<EMMessage> values, int chat_type, Context context) {
         mValues = values;
         this.chat_type = chat_type;
+        this.context = context;
     }
 
     @Override
@@ -95,10 +103,10 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
 
         if (holder instanceof ReceiveTxtHolder) {
-            ReceiveTxtHolder receiveTxtHolder = (ReceiveTxtHolder) holder;
+            final ReceiveTxtHolder receiveTxtHolder = (ReceiveTxtHolder) holder;
             String msg = mValues.get(position).getBody().toString();
             int start = msg.indexOf("txt:\"");
             int end = msg.lastIndexOf("\"");
@@ -110,6 +118,18 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             } else {
                 receiveTxtHolder.mTvUserName.setVisibility(View.GONE);
             }
+
+            AvatarUtils.setAvatar(context, mValues.get(position).getFrom(), receiveTxtHolder.mIvUserAvatar);
+            receiveTxtHolder.mIvUserAvatar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation((Activity) context, receiveTxtHolder.mIvUserAvatar, "TransImage");
+                    Intent intent = new Intent(context, UserDetailActivity.class);
+                    intent.putExtra("username", mValues.get(position).getFrom());
+                    context.startActivity(intent, options.toBundle());
+                }
+            });
+
         }
 
         if (holder instanceof SendTxtHolder) {
@@ -133,41 +153,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         return mValues.size();
     }
 
-//    public class ReceiveTxtHolder extends RecyclerView.ViewHolder {
-//        public ReceiveTxtHolder(View itemView) {
-//            super(itemView);
-//
-//
-//        }
-//    }
-//
-//    public class ReceiveImageHolder extends RecyclerView.ViewHolder {
-//        public ReceiveImageHolder(View itemView) {
-//            super(itemView);
-//
-//        }
-//    }
-//
-//    public class ReceiveVoice extends RecyclerView.ViewHolder {
-//        public ReceiveVoice(View itemView) {
-//            super(itemView);
-//
-//        }
-//    }
-//
-//    public class SendTxtHolder extends RecyclerView.ViewHolder {
-//        public SendTxtHolder(View itemView) {
-//            super(itemView);
-//
-//        }
-//    }
-//
-//    public class SendImageHolder extends RecyclerView.ViewHolder {
-//        public SendImageHolder(View itemView) {
-//            super(itemView);
-//
-//        }
-//    }
+
 
 
     static class SendVoiceHolder extends RecyclerView.ViewHolder {

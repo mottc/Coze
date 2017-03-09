@@ -1,5 +1,6 @@
 package com.mottc.coze.main;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import com.mottc.coze.R;
 import com.mottc.coze.bean.CozeUser;
 import com.mottc.coze.main.ContactFragment.OnContactItemClickListener;
+import com.mottc.coze.utils.AvatarUtils;
 
 import java.util.List;
 
@@ -23,10 +25,12 @@ public class ContactRecyclerViewAdapter extends RecyclerView.Adapter<ContactRecy
 
     private final List<CozeUser> mValues;
     private final OnContactItemClickListener mListener;
+    private Context context;
 
-    public ContactRecyclerViewAdapter(List<CozeUser> items, OnContactItemClickListener listener) {
+    public ContactRecyclerViewAdapter(List<CozeUser> items, OnContactItemClickListener listener, Context context) {
         mValues = items;
         mListener = listener;
+        this.context = context;
     }
 
     @Override
@@ -45,6 +49,8 @@ public class ContactRecyclerViewAdapter extends RecyclerView.Adapter<ContactRecy
         } else {
             holder.mUserName.setText(mValues.get(position).getUserName());
         }
+
+        AvatarUtils.setAvatar(context,mValues.get(position).getUserName(),holder.mAvatar);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override

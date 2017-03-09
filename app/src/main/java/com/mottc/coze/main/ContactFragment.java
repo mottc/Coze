@@ -78,7 +78,7 @@ public class ContactFragment extends Fragment {
             mRecyclerView = (RecyclerView) recyclerView;
             mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
             mRecyclerView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
-            mContactRecyclerViewAdapter = new ContactRecyclerViewAdapter(contactList, mListener);
+            mContactRecyclerViewAdapter = new ContactRecyclerViewAdapter(contactList, mListener,getContext());
             mRecyclerView.setAdapter(mContactRecyclerViewAdapter);
         }
         return view;

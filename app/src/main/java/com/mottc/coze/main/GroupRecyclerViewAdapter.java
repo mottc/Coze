@@ -1,5 +1,6 @@
 package com.mottc.coze.main;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import com.hyphenate.chat.EMGroup;
 import com.mottc.coze.R;
 import com.mottc.coze.main.GroupFragment.OnGroupItemListener;
+import com.mottc.coze.utils.AvatarUtils;
 
 import java.util.List;
 
@@ -23,10 +25,12 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
 
     private final List<EMGroup> mValues;
     private final OnGroupItemListener mListener;
+    private Context context;
 
-    public GroupRecyclerViewAdapter(List<EMGroup> items, OnGroupItemListener listener) {
+    public GroupRecyclerViewAdapter(List<EMGroup> items, OnGroupItemListener listener, Context context) {
         mValues = items;
         mListener = listener;
+        this.context = context;
     }
 
     @Override
@@ -40,6 +44,7 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
         holder.mUserName.setText(mValues.get(position).getGroupName());
+        AvatarUtils.setAvatar(context, mValues.get(position).getGroupId(), holder.mAvatar);
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
