@@ -67,7 +67,9 @@
             android:launchMode="singleTask"
             android:theme="@style/MainTheme">
         </activity>
-        <activity android:name=".login.LoginActivity">
+        <activity
+            android:name=".login.LoginActivity"
+            android:theme="@style/LoginActivityTheme">
         </activity>
         <activity
             android:name=".chat.ChatActivity"
@@ -77,6 +79,25 @@
         <activity
             android:name=".detail.UserDetailActivity"
             android:theme="@style/MainTheme">
+        </activity>
+        <activity
+            android:name=".detail.GroupDetailActivity"
+            android:theme="@style/MainTheme">
+        </activity>
+        <activity
+            android:name=".add.AddNewFriendActivity"
+            android:theme="@style/ChatActivityTheme">
+        </activity>
+        <activity
+            android:name=".add.CreateGroupActivity"
+            android:theme="@style/ChatActivityTheme">
+        </activity>
+        <activity
+            android:name=".add.AddGroupActivity"
+            android:theme="@style/ChatActivityTheme">
+        </activity>
+        <activity android:name=".message.MessageActivity"
+                  android:theme="@style/ChatActivityTheme">
         </activity>
     </application>
 

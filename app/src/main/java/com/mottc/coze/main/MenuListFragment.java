@@ -25,8 +25,12 @@ import com.hyphenate.chat.EMClient;
 import com.mottc.coze.Constant;
 import com.mottc.coze.CozeApplication;
 import com.mottc.coze.R;
+import com.mottc.coze.add.AddGroupActivity;
+import com.mottc.coze.add.AddNewFriendActivity;
+import com.mottc.coze.add.CreateGroupActivity;
 import com.mottc.coze.detail.UserDetailActivity;
 import com.mottc.coze.login.LoginActivity;
+import com.mottc.coze.message.MessageActivity;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -69,9 +73,17 @@ public class MenuListFragment extends Fragment {
                         logout();
                         break;
                     case R.id.drawer_add_friend:
-                        Toast.makeText(getActivity(), "add_f", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(getActivity(), AddNewFriendActivity.class));
                         break;
-
+                    case R.id.drawer_create_group:
+                        startActivity(new Intent(getActivity(), CreateGroupActivity.class));
+                        break;
+                    case R.id.drawer_add_group:
+                        startActivity(new Intent(getActivity(), AddGroupActivity.class));
+                        break;
+                    case R.id.drawer_notification:
+                        startActivity(new Intent(getActivity(), MessageActivity.class));
+                        break;
                 }
 
                 return false;

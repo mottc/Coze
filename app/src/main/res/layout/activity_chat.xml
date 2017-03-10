@@ -23,12 +23,19 @@
             android:background="@color/colorPrimary"
             app:popupTheme="@style/AppTheme.PopupOverlay"
             >
+            <ImageButton
+                android:id="@+id/btn_detail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:background="#0000"
+                android:layout_gravity="end"/>
             <TextView
                 android:id="@+id/talkTo"
                 android:transitionName="chatToUserName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="18dp"
+                android:textSize="18sp"
                 android:textColor="@android:color/white"/>
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>

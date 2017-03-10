@@ -1,11 +1,13 @@
 package com.mottc.coze.chat;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -20,7 +22,10 @@ import com.hyphenate.chat.EMConversation;
 import com.hyphenate.chat.EMMessage;
 import com.mottc.coze.Constant;
 import com.mottc.coze.R;
+import com.mottc.coze.detail.GroupDetailActivity;
+import com.mottc.coze.detail.UserDetailActivity;
 import com.mottc.coze.utils.CommonUtils;
+import com.mottc.coze.utils.DisplayUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,12 +66,15 @@ public class ChatActivity extends AppCompatActivity {
     ImageButton mRemove;
     @BindView(R.id.talkTo)
     TextView mTalkTo;
+    @BindView(R.id.btn_detail)
+    ImageButton mBtnDetail;
 
     private String toChatUsername;
     private int chat_type;
     private List<EMMessage> messages;
     private ChatAdapter mChatAdapter;
     private EMConversation conversation;
+    private List<View> hideInputExcludeViews;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +84,8 @@ public class ChatActivity extends AppCompatActivity {
         toChatUsername = this.getIntent().getStringExtra("toUsername");
         chat_type = this.getIntent().getIntExtra("chat_type", Constant.USER);
         messages = new ArrayList<>();
+        hideInputExcludeViews = new ArrayList<>();
+        hideInputExcludeViews.add(mSend);
         initView();
         getMsg();
         mChatAdapter = new ChatAdapter(messages, chat_type, this);
@@ -101,13 +111,6 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
         mChatToolbar.setTitle("");
-        if (chat_type == Constant.GROUP) {
-            String groupName = EMClient.getInstance().groupManager().getGroup(toChatUsername).getGroupName();
-            mTalkTo.setText(groupName);
-        } else {
-//            String nickname = CommonUtils.getNickName(toChatUsername);
-            mTalkTo.setText(toChatUsername);
-        }
         setSupportActionBar(mChatToolbar);
         mChatToolbar.setNavigationIcon(R.drawable.back);
         mChatToolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -116,6 +119,29 @@ public class ChatActivity extends AppCompatActivity {
                 ChatActivity.super.onBackPressed();
             }
         });
+
+        if (chat_type == Constant.GROUP) {
+            String groupName = EMClient.getInstance().groupManager().getGroup(toChatUsername).getGroupName();
+            mTalkTo.setText(groupName);
+            mBtnDetail.setImageResource(R.drawable.group);
+            mBtnDetail.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(ChatActivity.this, GroupDetailActivity.class).putExtra("group_id", toChatUsername));
+                }
+            });
+        } else {
+//            String nickname = CommonUtils.getNickName(toChatUsername);
+            mTalkTo.setText(toChatUsername);
+            mBtnDetail.setImageResource(R.drawable.person);
+            mBtnDetail.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(ChatActivity.this, UserDetailActivity.class).putExtra("username", toChatUsername));
+                }
+            });
+        }
+
 
     }
 
@@ -212,7 +238,7 @@ public class ChatActivity extends AppCompatActivity {
     }
 
 
-    @OnClick({R.id.image, R.id.voice, R.id.camera, R.id.phone, R.id.video, R.id.send, R.id.add, R.id.chat_content, R.id.remove})
+    @OnClick({R.id.image, R.id.btn_detail, R.id.voice, R.id.camera, R.id.phone, R.id.video, R.id.send, R.id.add, R.id.chat_content, R.id.remove})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.image:
@@ -240,7 +266,8 @@ public class ChatActivity extends AppCompatActivity {
             case R.id.remove:
                 mAddChoose.setVisibility(View.GONE);
                 break;
-
+            case R.id.btn_detail:
+                break;
         }
     }
 
@@ -256,4 +283,12 @@ public class ChatActivity extends AppCompatActivity {
         super.onDestroy();
         EMClient.getInstance().chatManager().removeMessageListener(msgListener);
     }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        /*点击非键盘区，键盘落下*/
+        DisplayUtils.hideInputWhenTouchOtherView(this, event, hideInputExcludeViews);
+        return super.dispatchTouchEvent(event);
+    }
+
 }

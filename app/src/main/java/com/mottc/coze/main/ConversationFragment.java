@@ -91,7 +91,6 @@ public class ConversationFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EMClient.getInstance().chatManager().addMessageListener(msgListener);
-
     }
 
     @Override
@@ -109,6 +108,7 @@ public class ConversationFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        EMClient.getInstance().chatManager().removeMessageListener(msgListener);
     }
 
     @Override

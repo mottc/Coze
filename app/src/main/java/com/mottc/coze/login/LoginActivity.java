@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
@@ -24,6 +25,7 @@ import com.mottc.coze.db.DaoMaster;
 import com.mottc.coze.db.DaoSession;
 import com.mottc.coze.main.MainActivity;
 import com.mottc.coze.utils.CommonUtils;
+import com.mottc.coze.utils.DisplayUtils;
 
 import org.greenrobot.greendao.database.Database;
 
@@ -258,6 +260,13 @@ public class LoginActivity extends AppCompatActivity {
         } catch (HyphenateException e) {
             e.printStackTrace();
         }
+    }
 
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        /*点击非键盘区，键盘落下*/
+        DisplayUtils.hideInputWhenTouchOtherView(this, event, null);
+        return super.dispatchTouchEvent(event);
     }
 }

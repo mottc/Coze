@@ -16,15 +16,25 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.hyphenate.EMConnectionListener;
+import com.hyphenate.EMContactListener;
 import com.hyphenate.EMError;
+import com.hyphenate.EMGroupChangeListener;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMConversation;
 import com.hyphenate.chat.EMGroup;
 import com.hyphenate.util.NetUtils;
 import com.mottc.coze.Constant;
+import com.mottc.coze.CozeApplication;
 import com.mottc.coze.R;
+import com.mottc.coze.add.AddGroupActivity;
+import com.mottc.coze.add.AddNewFriendActivity;
+import com.mottc.coze.add.CreateGroupActivity;
 import com.mottc.coze.bean.CozeUser;
+import com.mottc.coze.bean.InviteMessage;
 import com.mottc.coze.chat.ChatActivity;
+import com.mottc.coze.db.CozeUserDao;
+import com.mottc.coze.db.InviteMessageDao;
+import com.mottc.coze.message.MessageActivity;
 import com.mxn.soul.flowingdrawer_core.FlowingDrawer;
 import com.yalantis.contextmenu.lib.ContextMenuDialogFragment;
 import com.yalantis.contextmenu.lib.MenuObject;
@@ -52,8 +62,12 @@ public class MainActivity extends AppCompatActivity
 
 
     private CozeConnectionListener mCozeConnectionListener;
+    private CozeContactListener mCozeContactListener;
+    private CozeGroupChangeListener mCozeGroupChangeListener;
     private ContextMenuDialogFragment mMenuDialogFragment;
     private FragmentManager fragmentManager;
+    private InviteMessageDao mInviteMessageDao;
+    private CozeUserDao mCozeUserDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +75,8 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         fragmentManager = getSupportFragmentManager();
-
+        mInviteMessageDao = CozeApplication.getInstance().getDaoSession(EMClient.getInstance().getCurrentUser()).getInviteMessageDao();
+        mCozeUserDao = CozeApplication.getInstance().getDaoSession(EMClient.getInstance().getCurrentUser()).getCozeUserDao();
         setupToolbar();
         setupMenu();
         initMenuFragment();
@@ -69,7 +84,11 @@ public class MainActivity extends AppCompatActivity
 
         //注册一个监听连接状态的listener
         mCozeConnectionListener = new CozeConnectionListener(this);
+        mCozeContactListener = new CozeContactListener(this);
+        mCozeGroupChangeListener = new CozeGroupChangeListener(this);
         EMClient.getInstance().addConnectionListener(mCozeConnectionListener);
+        EMClient.getInstance().contactManager().setContactListener(mCozeContactListener);
+        EMClient.getInstance().groupManager().addGroupChangeListener(mCozeGroupChangeListener);
 
     }
 
@@ -104,6 +123,20 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onMenuItemClick(View clickedView, int position) {
 //                Toast.makeText(Parent(), String.valueOf(position), Toast.LENGTH_SHORT).show();
+                switch (position) {
+                    case 1:
+                        startActivity(new Intent(MainActivity.this, AddNewFriendActivity.class));
+                        break;
+                    case 2:
+                        startActivity(new Intent(MainActivity.this, AddGroupActivity.class));
+                        break;
+                    case 3:
+                        startActivity(new Intent(MainActivity.this, CreateGroupActivity.class));
+                        break;
+                    case 4:
+                        startActivity(new Intent(MainActivity.this, MessageActivity.class));
+                        break;
+                }
 //TODO:
 
             }
@@ -183,6 +216,8 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         EMClient.getInstance().removeConnectionListener(mCozeConnectionListener);
+        EMClient.getInstance().contactManager().removeContactListener(mCozeContactListener);
+        EMClient.getInstance().groupManager().removeGroupChangeListener(mCozeGroupChangeListener);
     }
 
     @Override
@@ -257,6 +292,120 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
             });
+
+        }
+    }
+
+    private class CozeContactListener implements EMContactListener {
+        private Context mContext;
+
+        public CozeContactListener(Context context) {
+            mContext = context;
+        }
+
+        @Override
+        public void onContactAdded(String username) {
+            mCozeUserDao.insertOrReplace(new CozeUser(null, username, null, null));
+        }
+
+        @Override
+        public void onContactDeleted(String username) {
+            CozeUser deletedCozeUser = mCozeUserDao.queryBuilder().where(CozeUserDao.Properties.UserName.eq(username)).build().unique();
+            mCozeUserDao.deleteByKey(deletedCozeUser.getId());
+        }
+
+        @Override
+        public void onContactInvited(String username, String reason) {
+
+
+            // 自己封装的javabean
+            InviteMessage msg = new InviteMessage();
+            msg.setFrom(username);
+            msg.setReason(reason);
+            msg.setType(Constant.USER_WANT_TO_BE_FRIEND);
+            msg.setStatus(Constant.UNDO);
+            mInviteMessageDao.insert(msg);
+//            TODO:通知
+
+        }
+
+        @Override
+        public void onFriendRequestAccepted(String username) {
+            Toast.makeText(mContext, username + "同意了你的好友请求", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onFriendRequestDeclined(String username) {
+            Toast.makeText(mContext, username + "拒绝了你的好友请求", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private class CozeGroupChangeListener implements EMGroupChangeListener {
+        private Context mContext;
+
+        public CozeGroupChangeListener(Context context) {
+            mContext = context;
+        }
+
+        @Override
+        public void onInvitationReceived(String groupId, String groupName, String inviter, String reason) {
+//          inviter邀请当前用户进群
+            InviteMessage inviteMessage = new InviteMessage();
+            inviteMessage.setFrom(inviter);
+            inviteMessage.setGroupName(groupName);
+            inviteMessage.setReason(reason);
+            inviteMessage.setType(Constant.USER_INVITE_TO_GROUP);
+            inviteMessage.setStatus(Constant.UNDO);
+            mInviteMessageDao.insert(inviteMessage);
+        }
+
+        @Override
+        public void onRequestToJoinReceived(String groupId, String groupName, String applicant, String reason) {
+//          applicant要求进群
+            InviteMessage inviteMessage = new InviteMessage();
+            inviteMessage.setFrom(applicant);
+            inviteMessage.setGroupName(groupName);
+            inviteMessage.setReason(reason);
+            inviteMessage.setType(Constant.USER_WANT_TO_IN_GROUP);
+            inviteMessage.setStatus(Constant.UNDO);
+            mInviteMessageDao.insert(inviteMessage);
+
+        }
+
+        @Override
+        public void onRequestToJoinAccepted(String groupId, String groupName, String accepter) {
+
+            Toast.makeText(mContext, accepter + "已同意你加入" + groupName, Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onRequestToJoinDeclined(String groupId, String groupName, String decliner, String reason) {
+            Toast.makeText(mContext, decliner + "已拒绝你加入" + groupName, Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onInvitationAccepted(String groupId, String invitee, String reason) {
+            Toast.makeText(mContext, invitee + "已同意你的加群邀请",Toast.LENGTH_SHORT).show();
+        }
+
+
+        @Override
+        public void onInvitationDeclined(String groupId, String invitee, String reason) {
+            Toast.makeText(mContext, invitee + "拒绝了你的加群邀请",Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onUserRemoved(String groupId, String groupName) {
+
+        }
+
+        @Override
+        public void onGroupDestroyed(String groupId, String groupName) {
+
+        }
+
+        @Override
+        public void onAutoAcceptInvitationFromGroup(String groupId, String inviter, String inviteMessage) {
 
         }
     }

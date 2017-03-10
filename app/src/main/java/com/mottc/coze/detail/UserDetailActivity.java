@@ -1,5 +1,6 @@
 package com.mottc.coze.detail;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -14,7 +15,9 @@ import android.widget.TextView;
 import com.hyphenate.chat.EMClient;
 import com.mottc.coze.CozeApplication;
 import com.mottc.coze.R;
+import com.mottc.coze.add.AddNewFriendActivity;
 import com.mottc.coze.bean.CozeUser;
+import com.mottc.coze.chat.ChatActivity;
 import com.mottc.coze.db.CozeUserDao;
 import com.mottc.coze.utils.AvatarUtils;
 
@@ -103,9 +106,6 @@ public class UserDetailActivity extends AppCompatActivity {
         mTvNickname.setText(nickname);
 
         AvatarUtils.setAvatar(this,username,mImage);
-
-
-
     }
 
     private void getNickName() {
@@ -130,10 +130,14 @@ public class UserDetailActivity extends AppCompatActivity {
 //                        .getCozeUserDao().update(cozeUser);
                 break;
             case R.id.btn_send_msg:
+                startActivity(new Intent(this, ChatActivity.class).putExtra("toUsername", username));
+                finish();
                 break;
             case R.id.btn_change_avatar:
                 break;
             case R.id.btn_add_friend:
+                startActivity(new Intent(this, AddNewFriendActivity.class).putExtra("new_name", username));
+                finish();
                 break;
         }
     }
