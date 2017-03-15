@@ -126,7 +126,6 @@ public class GroupDetailActivity extends AppCompatActivity {
                 @Override
                 public void OnGroupMembersListClick(String item) {
                     startActivity(new Intent(GroupDetailActivity.this, UserDetailActivity.class).putExtra("username", item));
-                    finish();
                 }
             });
 

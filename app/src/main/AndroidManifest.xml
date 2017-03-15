@@ -96,8 +96,11 @@
             android:name=".add.AddGroupActivity"
             android:theme="@style/ChatActivityTheme">
         </activity>
-        <activity android:name=".message.MessageActivity"
-                  android:theme="@style/ChatActivityTheme">
+        <activity
+            android:name=".message.MessageActivity"
+            android:theme="@style/ChatActivityTheme">
+        </activity>
+        <activity android:name=".avatar.UploadAvatarActivity">
         </activity>
     </application>
 

@@ -101,13 +101,13 @@ public class ContactFragment extends Fragment {
         super.onDetach();
         mListener = null;
     }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        getContactList();
-        mContactRecyclerViewAdapter.notifyDataSetChanged();
-    }
+//TODO:为什么要刷新
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        getContactList();
+//        mContactRecyclerViewAdapter.notifyDataSetChanged();
+//    }
 
     /**
      * 获取联系人列表

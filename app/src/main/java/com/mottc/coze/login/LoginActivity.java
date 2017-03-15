@@ -19,6 +19,7 @@ import com.hyphenate.chat.EMClient;
 import com.hyphenate.exceptions.HyphenateException;
 import com.mottc.coze.CozeApplication;
 import com.mottc.coze.R;
+import com.mottc.coze.avatar.UploadAvatarActivity;
 import com.mottc.coze.bean.CozeUser;
 import com.mottc.coze.db.CozeUserDao;
 import com.mottc.coze.db.DaoMaster;
@@ -208,7 +209,8 @@ public class LoginActivity extends AppCompatActivity {
                                         // 保存用户名
                                         CozeApplication.getInstance().setCurrentUserName(RegisterUserName);
                                         Toast.makeText(getApplicationContext(), getResources().getString(R.string.registered_successfully), Toast.LENGTH_LONG).show();
-                                        startActivity(new Intent(LoginActivity.this, LoginActivity.class));
+                                        startActivity(new Intent(LoginActivity.this, UploadAvatarActivity.class));
+                                        finish();
                                     }
                                 });
                             } catch (final HyphenateException e) {

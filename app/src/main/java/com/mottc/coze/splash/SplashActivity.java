@@ -44,7 +44,7 @@ public class SplashActivity extends AppCompatActivity {
                 .into(mSplashImage);
 
 //      LOGO位移动画
-        TranslateAnimation translateAnimation = new TranslateAnimation(0, -250, 0, 680);
+        TranslateAnimation translateAnimation = new TranslateAnimation(0, -250, 0, 800);
         translateAnimation.setFillAfter(true);
         translateAnimation.setDuration(1500);
         translateAnimation.setStartOffset(1000);

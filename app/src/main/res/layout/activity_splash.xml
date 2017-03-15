@@ -18,8 +18,9 @@
     <ImageView
         android:id="@+id/coze_logo"
         android:layout_width="175dp"
-        android:layout_height="150dp"
+        android:layout_height="wrap_content"
         android:layout_centerInParent="true"
+        android:paddingBottom="150dp"
         android:src="@drawable/coze_logo"
         />
 

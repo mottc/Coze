@@ -17,7 +17,8 @@
             android:transitionName="TransImage"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:layout_margin="12dp"/>
+            android:layout_margin="12dp"
+            android:scaleType="centerCrop"/>
 
         <TextView
             android:id="@+id/userName"

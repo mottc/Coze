@@ -39,7 +39,7 @@ public class AddNewFriendActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         String new_name = this.getIntent().getStringExtra("new_name");
         if (new_name != null) {
-            mEtReason.setText(new_name);
+            mEtUsername.setText(new_name);
         }
         setSupportActionBar(mAddFriendToolbar);
         mAddFriendToolbar.setTitle("添加好友");
