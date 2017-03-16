@@ -209,7 +209,8 @@ public class LoginActivity extends AppCompatActivity {
                                         // 保存用户名
                                         CozeApplication.getInstance().setCurrentUserName(RegisterUserName);
                                         Toast.makeText(getApplicationContext(), getResources().getString(R.string.registered_successfully), Toast.LENGTH_LONG).show();
-                                        startActivity(new Intent(LoginActivity.this, UploadAvatarActivity.class));
+                                        startActivity(new Intent(LoginActivity.this, UploadAvatarActivity.class).putExtra("username",RegisterUserName)
+                                        .putExtra("loginPassword",RegisterPassword));
                                         finish();
                                     }
                                 });

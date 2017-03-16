@@ -1,12 +1,15 @@
 package com.mottc.coze.chat;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -15,6 +18,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hyphenate.EMMessageListener;
 import com.hyphenate.chat.EMClient;
@@ -27,6 +31,7 @@ import com.mottc.coze.detail.UserDetailActivity;
 import com.mottc.coze.utils.CommonUtils;
 import com.mottc.coze.utils.DisplayUtils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,6 +80,8 @@ public class ChatActivity extends AppCompatActivity {
     private ChatAdapter mChatAdapter;
     private EMConversation conversation;
     private List<View> hideInputExcludeViews;
+    private static final int IMAGE_REQUEST_CODE = 0;
+    private static final int CAMERA_REQUEST_CODE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +98,7 @@ public class ChatActivity extends AppCompatActivity {
         mChatAdapter = new ChatAdapter(messages, chat_type, this);
         mChatRecyclerView.setAdapter(mChatAdapter);
         mChatRecyclerView.scrollToPosition(messages.size() - 1);
+//        mChatRecyclerView.smoothScrollToPosition(messages.size() - 1);
         EMClient.getInstance().chatManager().addMessageListener(msgListener);
     }
 
@@ -236,12 +244,74 @@ public class ChatActivity extends AppCompatActivity {
         mTextContent.setText("");
         mTextContent.clearFocus();
     }
+    private void sendImage(String path) {
+        EMMessage message = EMMessage.createImageSendMessage(path, true, toChatUsername);
+
+        if (chat_type == Constant.GROUP)
+            message.setChatType(EMMessage.ChatType.GroupChat);
+        EMClient.getInstance().chatManager().sendMessage(message);
+        messages.add(message);
+        mChatAdapter.notifyDataSetChanged();
+        if (messages.size() > 0) {
+            mChatRecyclerView.smoothScrollToPosition(messages.size() - 1);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // 结果码不等于取消时候
+        if (resultCode != RESULT_CANCELED) {
+
+            switch (requestCode) {
+                case IMAGE_REQUEST_CODE:
+                    String[] filePathColumn = { MediaStore.Images.Media.DATA };
+                    Cursor cursor = this.getContentResolver().query(data.getData(), filePathColumn, null, null, null);
+                    if (cursor != null) {
+                        cursor.moveToFirst();
+                        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                        String picturePath = cursor.getString(columnIndex);
+                        cursor.close();
+                        if (picturePath == null || picturePath.equals("null")) {
+                            Toast toast = Toast.makeText(this, "can not find", Toast.LENGTH_SHORT);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+                            return;
+                        }
+                        sendImage(picturePath);
+                    } else {
+                        File file = new File(data.getData().getPath());
+                        if (!file.exists()) {
+                            Toast toast = Toast.makeText(this, "can not find", Toast.LENGTH_SHORT);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+                            return;
+                        }
+                        sendImage(file.getAbsolutePath());
+                    }
+                    break;
+                case CAMERA_REQUEST_CODE:
+
+                    break;
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+
+    }
 
 
-    @OnClick({R.id.image, R.id.btn_detail, R.id.voice, R.id.camera, R.id.phone, R.id.video, R.id.send, R.id.add, R.id.chat_content, R.id.remove})
+
+    @OnClick({R.id.image,R.id.voice, R.id.camera, R.id.phone, R.id.video, R.id.send, R.id.add, R.id.remove})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.image:
+//                Intent intentFromGallery = new Intent();
+//                intentFromGallery.setType("image/*"); // 设置文件类型
+//                intentFromGallery.setAction(Intent.ACTION_GET_CONTENT);
+
+
+
+                Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(intent, IMAGE_REQUEST_CODE);
                 break;
             case R.id.voice:
                 break;
@@ -261,12 +331,8 @@ public class ChatActivity extends AppCompatActivity {
             case R.id.add:
                 mAddChoose.setVisibility(View.VISIBLE);
                 break;
-            case R.id.chat_content:
-                break;
             case R.id.remove:
                 mAddChoose.setVisibility(View.GONE);
-                break;
-            case R.id.btn_detail:
                 break;
         }
     }

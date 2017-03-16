@@ -6,6 +6,8 @@ import android.net.NetworkInfo;
 
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMConversation;
+import com.hyphenate.util.EMLog;
+import com.hyphenate.util.PathUtil;
 import com.mottc.coze.Constant;
 import com.mottc.coze.CozeApplication;
 import com.mottc.coze.bean.CozeUser;
@@ -64,5 +66,11 @@ public class CommonUtils {
         return cozeUserList.get(0);
     }
 
+    public static String getThumbnailImagePath(String thumbRemoteUrl) {
+        String thumbImageName= thumbRemoteUrl.substring(thumbRemoteUrl.lastIndexOf("/") + 1, thumbRemoteUrl.length());
+        String path = PathUtil.getInstance().getImagePath()+"/"+ "th"+thumbImageName;
+        EMLog.d("msg", "thum image path:" + path);
+        return path;
+    }
 
 }

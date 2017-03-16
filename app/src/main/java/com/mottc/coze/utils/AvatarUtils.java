@@ -6,6 +6,7 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.mottc.coze.Constant;
 import com.mottc.coze.R;
+import com.qiniu.util.Auth;
 
 /**
  * Created with Android Studio
@@ -24,4 +25,13 @@ public class AvatarUtils {
                 .error(R.drawable.default_avatar)
                 .into(imageView);
     }
+
+
+    public static String creatImageToken(String userName) {
+        String bucketName = "jungle:" + userName + ".png";
+        Auth auth = Auth.create("thx5mKjSsksUU1I24M8XTt5q0DSjgs9tXpMB54gr", "Xw2OGDoefwxGEAuJP_SWHnvm32PssnJgTJRGeHTB");
+        String token = auth.uploadToken(bucketName);
+        return token;
+    }
+
 }

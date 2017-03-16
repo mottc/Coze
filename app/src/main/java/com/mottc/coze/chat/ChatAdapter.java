@@ -4,7 +4,10 @@ import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,12 +16,22 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.hyphenate.EMCallBack;
+import com.hyphenate.chat.EMClient;
+import com.hyphenate.chat.EMFileMessageBody;
+import com.hyphenate.chat.EMImageMessageBody;
 import com.hyphenate.chat.EMMessage;
+import com.hyphenate.chat.EMTextMessageBody;
+import com.hyphenate.util.ImageUtils;
 import com.mottc.coze.Constant;
 import com.mottc.coze.R;
+import com.mottc.coze.cache.ImageCache;
 import com.mottc.coze.detail.UserDetailActivity;
 import com.mottc.coze.utils.AvatarUtils;
+import com.mottc.coze.utils.CommonUtils;
 
+import java.io.File;
 import java.util.List;
 
 import butterknife.BindView;
@@ -35,11 +48,14 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final List<EMMessage> mValues;
     private int chat_type;
     private Context context;
+    private Activity mActivity;
+    EMCallBack messageReceiveCallback;
 
     public ChatAdapter(List<EMMessage> values, int chat_type, Context context) {
         mValues = values;
         this.chat_type = chat_type;
         this.context = context;
+        mActivity = (Activity) context;
     }
 
     @Override
@@ -107,10 +123,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         if (holder instanceof ReceiveTxtHolder) {
             final ReceiveTxtHolder receiveTxtHolder = (ReceiveTxtHolder) holder;
-            String msg = mValues.get(position).getBody().toString();
-            int start = msg.indexOf("txt:\"");
-            int end = msg.lastIndexOf("\"");
-            msg = msg.substring((start + 5), end);
+            EMTextMessageBody emTextMessageBody = (EMTextMessageBody) mValues.get(position).getBody();
+            String msg = emTextMessageBody.getMessage();
             receiveTxtHolder.mTvChatContent.setText(msg);
             if (chat_type == Constant.GROUP) {
                 receiveTxtHolder.mTvUserName.setVisibility(View.VISIBLE);
@@ -134,26 +148,161 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         if (holder instanceof SendTxtHolder) {
             SendTxtHolder sendTxtHolder = (SendTxtHolder) holder;
-            String msg = mValues.get(position).getBody().toString();
-            int start = msg.indexOf("txt:\"");
-            int end = msg.lastIndexOf("\"");
-            msg = msg.substring((start + 5), end);
+            EMTextMessageBody emTextMessageBody = (EMTextMessageBody) mValues.get(position).getBody();
+            String msg = emTextMessageBody.getMessage();
             sendTxtHolder.mTvChatContent.setText(msg);
         }
 
+        if (holder instanceof SendImageHolder) {
+            SendImageHolder sendImageHolder = (SendImageHolder) holder;
+            EMImageMessageBody emImageMessageBody = (EMImageMessageBody) mValues.get(position).getBody();
+            Glide
+                    .with(context)
+                    .load(emImageMessageBody.getLocalUrl())
+                    .into(sendImageHolder.mSendImage);
+        }
+
+        if (holder instanceof ReceiveImageHolder) {
+            final ReceiveImageHolder receiveImageHolder = (ReceiveImageHolder) holder;
+            final EMImageMessageBody emImageMessageBody = (EMImageMessageBody) mValues.get(position).getBody();
+
+            if (chat_type == Constant.GROUP) {
+                receiveImageHolder.mTvUserName.setVisibility(View.VISIBLE);
+                receiveImageHolder.mTvUserName.setText(mValues.get(position).getFrom());
+            } else {
+                receiveImageHolder.mTvUserName.setVisibility(View.GONE);
+            }
+
+            AvatarUtils.setAvatar(context, mValues.get(position).getFrom(), receiveImageHolder.mIvUserAvatar);
+            receiveImageHolder.mIvUserAvatar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation((Activity) context, receiveImageHolder.mIvUserAvatar, "TransImage");
+                    Intent intent = new Intent(context, UserDetailActivity.class);
+                    intent.putExtra("username", mValues.get(position).getFrom());
+                    context.startActivity(intent, options.toBundle());
+                }
+            });
+//TODO:
+            if (emImageMessageBody.thumbnailDownloadStatus() == EMFileMessageBody.EMDownloadStatus.DOWNLOADING ||
+                    emImageMessageBody.thumbnailDownloadStatus() == EMFileMessageBody.EMDownloadStatus.PENDING) {
+                receiveImageHolder.mReceiveImage.setImageResource(R.drawable.image);
+
+                mValues.get(position).setMessageStatusCallback(new EMCallBack() {
+                    @Override
+                    public void onSuccess() {
+                        mActivity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                receiveImageHolder.mProgressBar.setVisibility(View.GONE);
+                                receiveImageHolder.mPercentage.setVisibility(View.GONE);
+                                String thumbPath = emImageMessageBody.thumbnailLocalPath();
+                                if (!new File(thumbPath).exists()) {
+                                    // to make it compatible with thumbnail received in previous version
+                                    thumbPath = CommonUtils.getThumbnailImagePath(emImageMessageBody.getLocalUrl());
+                                }
+                                showImageView(thumbPath, receiveImageHolder.mReceiveImage, emImageMessageBody.getLocalUrl(), mValues.get(position));
+                            }
+                        });
+
+                    }
+
+                    @Override
+                    public void onError(int code, String error) {
+
+                    }
+
+                    @Override
+                    public void onProgress(final int progress, String status) {
+                        mActivity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Log.i("ChatAdapter", "run: " + progress);
+                                receiveImageHolder.mPercentage.setText(String.valueOf(progress));
+                            }
+                        });
+
+                    }
+                });
 
 
+            } else {
+                receiveImageHolder.mPercentage.setVisibility(View.GONE);
+                receiveImageHolder.mProgressBar.setVisibility(View.GONE);
+                String thumbPath = emImageMessageBody.thumbnailLocalPath();
+                if (!new File(thumbPath).exists()) {
+                    // to make it compatible with thumbnail received in previous version
+                    thumbPath = CommonUtils.getThumbnailImagePath(emImageMessageBody.getLocalUrl());
+                }
+                showImageView(thumbPath, receiveImageHolder.mReceiveImage, emImageMessageBody.getLocalUrl(), mValues.get(position));
+
+            }
 
 
+        }
 
     }
+
+
+    private boolean showImageView(final String thumbernailPath, final ImageView iv, final String localFullSizePath, final EMMessage message) {
+        // first check if the thumbnail image already loaded into cache
+        Bitmap bitmap = ImageCache.getInstance().get(thumbernailPath);
+        if (bitmap != null) {
+            // thumbnail image is already loaded, reuse the drawable
+            iv.setImageBitmap(bitmap);
+            return true;
+        } else {
+            new AsyncTask<Object, Void, Bitmap>() {
+
+                @Override
+                protected Bitmap doInBackground(Object... args) {
+                    File file = new File(thumbernailPath);
+                    if (file.exists()) {
+                        return ImageUtils.decodeScaleImage(thumbernailPath, 160, 160);
+                    } else if (new File(((EMImageMessageBody) (message.getBody())).thumbnailLocalPath()).exists()) {
+                        return ImageUtils.decodeScaleImage(((EMImageMessageBody) (message.getBody())).thumbnailLocalPath(), 160, 160);
+                    } else {
+                        if (message.direct() == EMMessage.Direct.SEND) {
+                            if (localFullSizePath != null && new File(localFullSizePath).exists()) {
+                                return ImageUtils.decodeScaleImage(localFullSizePath, 160, 160);
+                            } else {
+                                return null;
+                            }
+                        } else {
+                            return null;
+                        }
+                    }
+                }
+
+                protected void onPostExecute(Bitmap image) {
+                    if (image != null) {
+                        iv.setImageBitmap(image);
+                        ImageCache.getInstance().put(thumbernailPath, image);
+                    } else {
+                        if (message.status() == EMMessage.Status.FAIL) {
+                            if (CommonUtils.isNetWorkConnected(context)) {
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        EMClient.getInstance().chatManager().downloadThumbnail(message);
+                                    }
+                                }).start();
+                            }
+                        }
+
+                    }
+                }
+            }.execute();
+
+            return true;
+        }
+    }
+
 
     @Override
     public int getItemCount() {
         return mValues.size();
     }
-
-
 
 
     static class SendVoiceHolder extends RecyclerView.ViewHolder {
@@ -242,7 +391,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
-    static class ReceiveTxtHolder extends RecyclerView.ViewHolder{
+    static class ReceiveTxtHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.timestamp)
         TextView mTimestamp;
         @BindView(R.id.tv_userName)

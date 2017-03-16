@@ -33,7 +33,6 @@ public class GroupMembersAdapter extends BaseAdapter {
     }
 
     public interface OnGroupMembersListClickListener {
-        // TODO: Update argument type and name
         void OnGroupMembersListClick(String item);
     }
 

@@ -34,20 +34,39 @@
             android:id="@+id/upload_avatar"
             android:layout_width="200dp"
             android:layout_height="200dp"
-            android:layout_marginBottom="80dp"
+            android:layout_marginBottom="20dp"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="10dp"
             android:background="@android:color/holo_blue_light"
             android:scaleType="centerCrop"
             android:src="@drawable/person"
             />
+        <LinearLayout
+            android:id="@+id/uploading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/upload_avatar"
+            android:visibility="gone"
+            android:orientation="vertical">
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="头像上传中..."/>
+        </LinearLayout>
+
         <Button
             android:id="@+id/pic_from_image"
             android:layout_width="120dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/upload_avatar"
+            android:layout_alignParentBottom="true"
             android:layout_marginTop="20dp"
             android:layout_marginLeft="40dp"
+            android:layout_marginBottom="20dp"
             android:background="@color/colorPrimary"
             android:text="从相册选取"
             android:textColor="@android:color/white"/>
@@ -55,20 +74,15 @@
             android:id="@+id/pic_from_camera"
             android:layout_width="120dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/upload_avatar"
             android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="20dp"
             android:layout_marginTop="20dp"
             android:layout_marginRight="40dp"
             android:background="@color/colorPrimary"
             android:text="拍照"
             android:textColor="@android:color/white"/>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:gravity="center"
-            android:textColor="@android:color/holo_red_light"
-            android:text="(注意：头像一经上传，不允许修改！)"/>
+
 
     </RelativeLayout>
 

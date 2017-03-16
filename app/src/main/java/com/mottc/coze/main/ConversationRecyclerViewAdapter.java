@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMConversation;
 import com.hyphenate.chat.EMMessage;
+import com.hyphenate.chat.EMTextMessageBody;
 import com.hyphenate.util.DateUtils;
 import com.mottc.coze.R;
 import com.mottc.coze.main.ConversationFragment.OnConversationItemClickListener;
@@ -89,10 +90,7 @@ public class ConversationRecyclerViewAdapter extends RecyclerView.Adapter<Conver
 
     public void setContent(ViewHolder holder, int position, String userName) {
         if (mValues.get(position).getLastMessage().getType().equals(EMMessage.Type.TXT)) {
-            String msg = mValues.get(position).getLastMessage().getBody().toString();
-            int start = msg.indexOf("txt:\"");
-            int end = msg.lastIndexOf("\"");
-            msg = msg.substring((start + 5), end);
+            String msg = ((EMTextMessageBody) (mValues.get(position).getLastMessage().getBody())).getMessage();
             holder.mContent.setText(String.format("%s%s", userName, msg));
         } else if (mValues.get(position).getLastMessage().getType().equals(EMMessage.Type.IMAGE)) {
             holder.mContent.setText(String.format("%s[图片]", userName));
