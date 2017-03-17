@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hyphenate.EMCallBack;
 import com.hyphenate.EMValueCallBack;
@@ -79,33 +80,35 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                     public void onClick(View v) {
                         holder.mAgree.setClickable(false);
                         holder.mRefuse.setClickable(false);
+                        EMClient.getInstance().contactManager().asyncAcceptInvitation(inviteMessage.getFrom(), new EMCallBack() {
+                            @Override
+                            public void onSuccess() {
+                                InviteMessage aNewInviteMessage = new InviteMessage();
+                                aNewInviteMessage.setId(inviteMessage.getId());
+                                aNewInviteMessage.setStatus(Constant.AGREE);
+                                aNewInviteMessage.setFrom(inviteMessage.getFrom());
+                                aNewInviteMessage.setType(inviteMessage.getType());
+                                aNewInviteMessage.setReason(inviteMessage.getReason());
+                                aNewInviteMessage.setGroupName(inviteMessage.getGroupName());
+                                aNewInviteMessage.setTime(inviteMessage.getTime());
 
+                                mInviteMessageDao.update(aNewInviteMessage);
+                                Toast.makeText(mContext, "成功", Toast.LENGTH_SHORT).show();
 
-                            EMClient.getInstance().contactManager().asyncAcceptInvitation(inviteMessage.getFrom(), new EMCallBack() {
-                                @Override
-                                public void onSuccess() {
-                                    InviteMessage aNewInviteMessage = new InviteMessage();
-                                    aNewInviteMessage.setId(inviteMessage.getId());
-                                    aNewInviteMessage.setStatus(Constant.AGREE);
-                                    aNewInviteMessage.setFrom(inviteMessage.getFrom());
-                                    aNewInviteMessage.setType(inviteMessage.getType());
-                                    aNewInviteMessage.setReason(inviteMessage.getReason());
-                                    aNewInviteMessage.setGroupName(inviteMessage.getGroupName());
-                                    aNewInviteMessage.setTime(inviteMessage.getTime());
+                            }
 
-                                    mInviteMessageDao.update(aNewInviteMessage);
-                                }
+                            @Override
+                            public void onError(int code, String error) {
+                                Toast.makeText(mContext, "出现错误，请重试", Toast.LENGTH_SHORT).show();
+                                holder.mAgree.setClickable(true);
+                                holder.mRefuse.setClickable(true);
+                            }
 
-                                @Override
-                                public void onError(int code, String error) {
+                            @Override
+                            public void onProgress(int progress, String status) {
 
-                                }
-
-                                @Override
-                                public void onProgress(int progress, String status) {
-
-                                }
-                            });
+                            }
+                        });
                     }
                 });
                 holder.mRefuse.setOnClickListener(new View.OnClickListener() {
@@ -126,11 +129,16 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                                 aNewInviteMessage.setGroupName(inviteMessage.getGroupName());
                                 aNewInviteMessage.setTime(inviteMessage.getTime());
                                 mInviteMessageDao.update(aNewInviteMessage);
+                                Toast.makeText(mContext, "成功", Toast.LENGTH_SHORT).show();
+
                             }
 
                             @Override
                             public void onError(int code, String error) {
 
+                                Toast.makeText(mContext, "出现错误，请重试", Toast.LENGTH_SHORT).show();
+                                holder.mAgree.setClickable(true);
+                                holder.mRefuse.setClickable(true);
                             }
 
                             @Override
@@ -162,11 +170,16 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                                 aNewInviteMessage.setGroupName(inviteMessage.getGroupName());
                                 aNewInviteMessage.setTime(inviteMessage.getTime());
                                 mInviteMessageDao.update(aNewInviteMessage);
+                                Toast.makeText(mContext, "成功", Toast.LENGTH_SHORT).show();
+
                             }
 
                             @Override
                             public void onError(int error, String errorMsg) {
 
+                                Toast.makeText(mContext, "出现错误，请重试", Toast.LENGTH_SHORT).show();
+                                holder.mAgree.setClickable(true);
+                                holder.mRefuse.setClickable(true);
                             }
                         });
                     }
@@ -189,11 +202,16 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                                 aNewInviteMessage.setGroupId(inviteMessage.getGroupId());
                                 aNewInviteMessage.setTime(inviteMessage.getTime());
                                 mInviteMessageDao.update(aNewInviteMessage);
+                                Toast.makeText(mContext, "成功", Toast.LENGTH_SHORT).show();
+
                             }
 
                             @Override
                             public void onError(int code, String error) {
 
+                                Toast.makeText(mContext, "出现错误，请重试", Toast.LENGTH_SHORT).show();
+                                holder.mAgree.setClickable(true);
+                                holder.mRefuse.setClickable(true);
                             }
 
                             @Override
@@ -229,11 +247,16 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                                 aNewInviteMessage.setGroupName(inviteMessage.getGroupName());
                                 aNewInviteMessage.setTime(inviteMessage.getTime());
                                 mInviteMessageDao.update(aNewInviteMessage);
+                                Toast.makeText(mContext, "成功", Toast.LENGTH_SHORT).show();
+
                             }
 
                             @Override
                             public void onError(int code, String error) {
 
+                                Toast.makeText(mContext, "出现错误，请重试", Toast.LENGTH_SHORT).show();
+                                holder.mAgree.setClickable(true);
+                                holder.mRefuse.setClickable(true);
                             }
 
                             @Override
@@ -265,11 +288,16 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                                         aNewInviteMessage.setGroupId(inviteMessage.getGroupId());
                                         aNewInviteMessage.setTime(inviteMessage.getTime());
                                         mInviteMessageDao.update(aNewInviteMessage);
+                                        Toast.makeText(mContext, "成功", Toast.LENGTH_SHORT).show();
+
                                     }
 
                                     @Override
                                     public void onError(int code, String error) {
 
+                                        Toast.makeText(mContext, "出现错误，请重试", Toast.LENGTH_SHORT).show();
+                                        holder.mAgree.setClickable(true);
+                                        holder.mRefuse.setClickable(true);
                                     }
 
                                     @Override
