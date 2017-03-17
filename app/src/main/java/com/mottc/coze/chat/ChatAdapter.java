@@ -49,7 +49,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private int chat_type;
     private Context context;
     private Activity mActivity;
-    EMCallBack messageReceiveCallback;
 
     public ChatAdapter(List<EMMessage> values, int chat_type, Context context) {
         mValues = values;
@@ -224,7 +223,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                     }
                 });
-
 
             } else {
                 receiveImageHolder.mPercentage.setVisibility(View.GONE);

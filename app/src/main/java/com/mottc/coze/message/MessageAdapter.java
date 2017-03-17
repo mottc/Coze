@@ -1,11 +1,15 @@
 package com.mottc.coze.message;
 
+import android.app.NotificationManager;
+import android.content.Context;
+import android.support.v4.app.NotificationCompat;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.hyphenate.chat.EMClient;
@@ -31,12 +35,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
     private List<InviteMessage> mInviteMessageList;
     private InviteMessageDao mInviteMessageDao;
+    private Context mContext;
 
-    public MessageAdapter(List<InviteMessage> inviteMessageList) {
+    public MessageAdapter(List<InviteMessage> inviteMessageList,Context context) {
         mInviteMessageList = inviteMessageList;
         mInviteMessageDao = CozeApplication.getInstance().getDaoSession(EMClient.getInstance().getCurrentUser()).getInviteMessageDao();
-
+        mContext = context;
     }
+
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -46,19 +52,23 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
 
         final InviteMessage inviteMessage = mInviteMessageList.get(position);
         holder.mFrom.setText(inviteMessage.getFrom());
         holder.mReason.setText(inviteMessage.getReason());
+        holder.mTime.setText(inviteMessage.getTime());
         if (inviteMessage.getStatus().equals(Constant.AGREE)) {
             holder.mUndo.setVisibility(View.GONE);
+            holder.mDone.setVisibility(View.VISIBLE);
             holder.mDone.setText(R.string.agree);
         } else if (inviteMessage.getStatus().equals(Constant.REFUSE)) {
             holder.mUndo.setVisibility(View.GONE);
+            holder.mDone.setVisibility(View.VISIBLE);
             holder.mDone.setText(R.string.refuse);
         } else {
             holder.mDone.setVisibility(View.GONE);
+            holder.mUndo.setVisibility(View.VISIBLE);
         }
 
         switch (inviteMessage.getType()) {
@@ -67,6 +77,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                 holder.mAgree.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        holder.mAgree.setClickable(false);
+                        holder.mRefuse.setClickable(false);
                         InviteMessage aNewInviteMessage = new InviteMessage();
                         aNewInviteMessage.setId(inviteMessage.getId());
                         aNewInviteMessage.setStatus(Constant.AGREE);
@@ -74,6 +86,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                         aNewInviteMessage.setType(inviteMessage.getType());
                         aNewInviteMessage.setReason(inviteMessage.getReason());
                         aNewInviteMessage.setGroupName(inviteMessage.getGroupName());
+                        aNewInviteMessage.setTime(inviteMessage.getTime());
 
                         mInviteMessageDao.update(aNewInviteMessage);
                         try {
@@ -86,6 +99,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                 holder.mRefuse.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        holder.mAgree.setClickable(false);
+                        holder.mRefuse.setClickable(false);
                         InviteMessage aNewInviteMessage = new InviteMessage();
                         aNewInviteMessage.setId(inviteMessage.getId());
                         aNewInviteMessage.setStatus(Constant.REFUSE);
@@ -93,6 +108,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                         aNewInviteMessage.setType(inviteMessage.getType());
                         aNewInviteMessage.setReason(inviteMessage.getReason());
                         aNewInviteMessage.setGroupName(inviteMessage.getGroupName());
+                        aNewInviteMessage.setTime(inviteMessage.getTime());
                         mInviteMessageDao.update(aNewInviteMessage);
                         try {
                             EMClient.getInstance().contactManager().declineInvitation(mInviteMessageList.get(position).getFrom());
@@ -109,12 +125,34 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                 break;
 
         }
+
+        holder.mCardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext)
+                        .setSmallIcon(R.drawable.add)
+                        .setContentTitle("***")
+                        .setContentText("请求加你为好友")
+                        .setAutoCancel(true);
+//TODO
+                NotificationManager manager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+                manager.notify(1, builder.build());
+            }
+        });
+        holder.mCardView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                return true;
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
         return mInviteMessageList.size();
     }
+
 
 
 
@@ -130,11 +168,16 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         @BindView(R.id.agree)
         Button mAgree;
         @BindView(R.id.undo)
-        LinearLayout mUndo;
+        RelativeLayout mUndo;
         @BindView(R.id.done)
         TextView mDone;
+        @BindView(R.id.time)
+        TextView mTime;
+        @BindView(R.id.cardView)
+        CardView mCardView;
 
         ViewHolder(View view) {
+
             super(view);
             ButterKnife.bind(this, view);
         }

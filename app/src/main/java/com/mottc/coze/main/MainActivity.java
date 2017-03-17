@@ -1,11 +1,13 @@
 package com.mottc.coze.main;
 
 import android.app.ActivityOptions;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -41,7 +43,9 @@ import com.yalantis.contextmenu.lib.MenuObject;
 import com.yalantis.contextmenu.lib.MenuParams;
 import com.yalantis.contextmenu.lib.interfaces.OnMenuItemClickListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -306,6 +310,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onContactAdded(String username) {
             mCozeUserDao.insertOrReplace(new CozeUser(null, username, null, null));
+
         }
 
         @Override
@@ -317,12 +322,15 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onContactInvited(String username, String reason) {
 
-
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");
+            Date curDate = new Date(System.currentTimeMillis());
+            String time = formatter.format(curDate);
             // 自己封装的javabean
             InviteMessage msg = new InviteMessage();
             msg.setFrom(username);
             msg.setReason(reason);
             msg.setType(Constant.USER_WANT_TO_BE_FRIEND);
+            msg.setTime(time);
             msg.setStatus(Constant.UNDO);
             mInviteMessageDao.insert(msg);
 //            TODO:通知
@@ -330,13 +338,33 @@ public class MainActivity extends AppCompatActivity
         }
 
         @Override
-        public void onFriendRequestAccepted(String username) {
-            Toast.makeText(mContext, username + "同意了你的好友请求", Toast.LENGTH_SHORT).show();
+        public void onFriendRequestAccepted(final String username) {
+
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext)
+                    .setSmallIcon(R.drawable.add)
+                    .setContentTitle(username)
+                    .setContentText("请求加你为好友")
+                    .setAutoCancel(true);
+
+            NotificationManager manager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+            manager.notify(1, builder.build());
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(mContext, username + "同意了你的好友请求", Toast.LENGTH_SHORT).show();
+
+                }
+            });
         }
 
         @Override
-        public void onFriendRequestDeclined(String username) {
-            Toast.makeText(mContext, username + "拒绝了你的好友请求", Toast.LENGTH_SHORT).show();
+        public void onFriendRequestDeclined(final String username) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(mContext, username + "拒绝了你的好友请求", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 
@@ -373,25 +401,52 @@ public class MainActivity extends AppCompatActivity
         }
 
         @Override
-        public void onRequestToJoinAccepted(String groupId, String groupName, String accepter) {
+        public void onRequestToJoinAccepted(String groupId, final String groupName, final String accepter) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(mContext, accepter + "已同意你加入" + groupName, Toast.LENGTH_SHORT).show();
 
-            Toast.makeText(mContext, accepter + "已同意你加入" + groupName, Toast.LENGTH_SHORT).show();
+                }
+            });
+
         }
 
         @Override
-        public void onRequestToJoinDeclined(String groupId, String groupName, String decliner, String reason) {
-            Toast.makeText(mContext, decliner + "已拒绝你加入" + groupName, Toast.LENGTH_SHORT).show();
+        public void onRequestToJoinDeclined(String groupId, final String groupName, final String decliner, String reason) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+                    Toast.makeText(mContext, decliner + "已拒绝你加入" + groupName, Toast.LENGTH_SHORT).show();
+
+                }
+            });
         }
 
         @Override
-        public void onInvitationAccepted(String groupId, String invitee, String reason) {
-            Toast.makeText(mContext, invitee + "已同意你的加群邀请",Toast.LENGTH_SHORT).show();
+        public void onInvitationAccepted(String groupId, final String invitee, String reason) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+                    Toast.makeText(mContext, invitee + "已同意你的加群邀请", Toast.LENGTH_SHORT).show();
+
+                }
+            });
         }
 
 
         @Override
-        public void onInvitationDeclined(String groupId, String invitee, String reason) {
-            Toast.makeText(mContext, invitee + "拒绝了你的加群邀请",Toast.LENGTH_SHORT).show();
+        public void onInvitationDeclined(String groupId, final String invitee, String reason) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+                    Toast.makeText(mContext, invitee + "拒绝了你的加群邀请", Toast.LENGTH_SHORT).show();
+
+                }
+            });
         }
 
         @Override

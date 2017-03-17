@@ -40,6 +40,7 @@ public class ContactFragment extends Fragment {
     private ContactRecyclerViewAdapter mContactRecyclerViewAdapter;
     RecyclerView mRecyclerView;
 
+    DaoSession daoSession;
     public ContactFragment() {
 
     }
@@ -53,6 +54,7 @@ public class ContactFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        daoSession = CozeApplication.getInstance().getDaoSession(EMClient.getInstance().getCurrentUser());
         getContactList();
     }
 
@@ -100,6 +102,7 @@ public class ContactFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        daoSession.getDatabase().close();
     }
 //TODO:为什么要刷新
 //    @Override
@@ -115,7 +118,6 @@ public class ContactFragment extends Fragment {
     protected void getContactList() {
         contactList.clear();
         // 获取联系人列表
-        DaoSession daoSession = CozeApplication.getInstance().getDaoSession(EMClient.getInstance().getCurrentUser());
         contactList.addAll(daoSession.getCozeUserDao().loadAll());
     }
 
@@ -126,7 +128,6 @@ public class ContactFragment extends Fragment {
         protected String[] doInBackground(Void... params) {
 
             contactList.clear();
-            DaoSession daoSession = CozeApplication.getInstance().getDaoSession(EMClient.getInstance().getCurrentUser());
             cozeUserDao = daoSession.getCozeUserDao();
             cozeUserDao.deleteAll();
             try {

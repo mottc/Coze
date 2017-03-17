@@ -2,41 +2,52 @@ package com.mottc.coze.bean;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
+import org.greenrobot.greendao.annotation.Unique;
 import org.greenrobot.greendao.annotation.Generated;
 
 /**
  * Created with Android Studio
  * User: mottc
- * Date: 2017/3/10
- * Time: 19:16
+ * Date: 2017/3/17
+ * Time: 16:10
  */
 @Entity
 public class InviteMessage {
+    //不能用int
     @Id(autoincrement = true)
-    private long id;
+    private Long id;
+    @Unique
+    private String time;
     private String from;
     private String reason;
     private String groupName;
-    private String status;
     private int type;
-    @Generated(hash = 179400718)
-    public InviteMessage(long id, String from, String reason, String groupName,
-            String status, int type) {
+    private String status;
+    @Generated(hash = 1509908040)
+    public InviteMessage(Long id, String time, String from, String reason,
+            String groupName, int type, String status) {
         this.id = id;
+        this.time = time;
         this.from = from;
         this.reason = reason;
         this.groupName = groupName;
-        this.status = status;
         this.type = type;
+        this.status = status;
     }
     @Generated(hash = 1613074736)
     public InviteMessage() {
     }
-    public long getId() {
+    public Long getId() {
         return this.id;
     }
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
+    }
+    public String getTime() {
+        return this.time;
+    }
+    public void setTime(String time) {
+        this.time = time;
     }
     public String getFrom() {
         return this.from;
@@ -56,17 +67,17 @@ public class InviteMessage {
     public void setGroupName(String groupName) {
         this.groupName = groupName;
     }
-    public String getStatus() {
-        return this.status;
-    }
-    public void setStatus(String status) {
-        this.status = status;
-    }
     public int getType() {
         return this.type;
     }
     public void setType(int type) {
         this.type = type;
     }
-    
+    public String getStatus() {
+        return this.status;
+    }
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
 }

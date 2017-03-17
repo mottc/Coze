@@ -46,7 +46,7 @@
         android:layout_height="42dp"
         android:orientation="horizontal"
         android:layout_alignParentBottom="true"
-        android:background="@android:color/white"
+        android:background="#eee"
         >
         <ImageButton
             android:id="@+id/send"
@@ -83,7 +83,7 @@
         android:layout_height="42dp"
         android:gravity="center_vertical"
         android:visibility="gone"
-        android:background="@android:color/white"
+        android:background="#eee"
         android:layout_alignParentBottom="true">
 
         <ImageButton
@@ -159,6 +159,7 @@
         app:layoutManager="LinearLayoutManager"
         android:layout_above="@id/input_layout"
         android:layout_below="@id/chat_bar"
+        android:background="@android:color/white"
         tools:context="com.mottc.coze.main.ChatActivity"
         android:paddingBottom="3dp"
         >

@@ -132,7 +132,7 @@ public class UploadAvatarActivity extends AppCompatActivity {
         mUploading.setVisibility(View.VISIBLE);
         mPicFromImage.setClickable(false);
         mPicFromCamera.setClickable(false);
-        String token = AvatarUtils.creatImageToken(username);
+        String token = AvatarUtils.createImageToken(username);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         photo.compress(Bitmap.CompressFormat.PNG, 100, baos);
         byte[] data = baos.toByteArray();

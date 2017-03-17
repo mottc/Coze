@@ -24,12 +24,13 @@ public class InviteMessageDao extends AbstractDao<InviteMessage, Long> {
      * Can be used for QueryBuilder and for referencing column names.
      */
     public static class Properties {
-        public final static Property Id = new Property(0, long.class, "id", true, "_id");
-        public final static Property From = new Property(1, String.class, "from", false, "FROM");
-        public final static Property Reason = new Property(2, String.class, "reason", false, "REASON");
-        public final static Property GroupName = new Property(3, String.class, "groupName", false, "GROUP_NAME");
-        public final static Property Status = new Property(4, String.class, "status", false, "STATUS");
+        public final static Property Id = new Property(0, Long.class, "id", true, "_id");
+        public final static Property Time = new Property(1, String.class, "time", false, "TIME");
+        public final static Property From = new Property(2, String.class, "from", false, "FROM");
+        public final static Property Reason = new Property(3, String.class, "reason", false, "REASON");
+        public final static Property GroupName = new Property(4, String.class, "groupName", false, "GROUP_NAME");
         public final static Property Type = new Property(5, int.class, "type", false, "TYPE");
+        public final static Property Status = new Property(6, String.class, "status", false, "STATUS");
     }
 
 
@@ -45,12 +46,13 @@ public class InviteMessageDao extends AbstractDao<InviteMessage, Long> {
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"INVITE_MESSAGE\" (" + //
-                "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL ," + // 0: id
-                "\"FROM\" TEXT," + // 1: from
-                "\"REASON\" TEXT," + // 2: reason
-                "\"GROUP_NAME\" TEXT," + // 3: groupName
-                "\"STATUS\" TEXT," + // 4: status
-                "\"TYPE\" INTEGER NOT NULL );"); // 5: type
+                "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
+                "\"TIME\" TEXT UNIQUE ," + // 1: time
+                "\"FROM\" TEXT," + // 2: from
+                "\"REASON\" TEXT," + // 3: reason
+                "\"GROUP_NAME\" TEXT," + // 4: groupName
+                "\"TYPE\" INTEGER NOT NULL ," + // 5: type
+                "\"STATUS\" TEXT);"); // 6: status
     }
 
     /** Drops the underlying database table. */
@@ -62,83 +64,103 @@ public class InviteMessageDao extends AbstractDao<InviteMessage, Long> {
     @Override
     protected final void bindValues(DatabaseStatement stmt, InviteMessage entity) {
         stmt.clearBindings();
-        stmt.bindLong(1, entity.getId());
+ 
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
+        }
+ 
+        String time = entity.getTime();
+        if (time != null) {
+            stmt.bindString(2, time);
+        }
  
         String from = entity.getFrom();
         if (from != null) {
-            stmt.bindString(2, from);
+            stmt.bindString(3, from);
         }
  
         String reason = entity.getReason();
         if (reason != null) {
-            stmt.bindString(3, reason);
+            stmt.bindString(4, reason);
         }
  
         String groupName = entity.getGroupName();
         if (groupName != null) {
-            stmt.bindString(4, groupName);
+            stmt.bindString(5, groupName);
         }
+        stmt.bindLong(6, entity.getType());
  
         String status = entity.getStatus();
         if (status != null) {
-            stmt.bindString(5, status);
+            stmt.bindString(7, status);
         }
-        stmt.bindLong(6, entity.getType());
     }
 
     @Override
     protected final void bindValues(SQLiteStatement stmt, InviteMessage entity) {
         stmt.clearBindings();
-        stmt.bindLong(1, entity.getId());
+ 
+        Long id = entity.getId();
+        if (id != null) {
+            stmt.bindLong(1, id);
+        }
+ 
+        String time = entity.getTime();
+        if (time != null) {
+            stmt.bindString(2, time);
+        }
  
         String from = entity.getFrom();
         if (from != null) {
-            stmt.bindString(2, from);
+            stmt.bindString(3, from);
         }
  
         String reason = entity.getReason();
         if (reason != null) {
-            stmt.bindString(3, reason);
+            stmt.bindString(4, reason);
         }
  
         String groupName = entity.getGroupName();
         if (groupName != null) {
-            stmt.bindString(4, groupName);
+            stmt.bindString(5, groupName);
         }
+        stmt.bindLong(6, entity.getType());
  
         String status = entity.getStatus();
         if (status != null) {
-            stmt.bindString(5, status);
+            stmt.bindString(7, status);
         }
-        stmt.bindLong(6, entity.getType());
     }
 
     @Override
     public Long readKey(Cursor cursor, int offset) {
-        return cursor.getLong(offset + 0);
+        return cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0);
     }    
 
     @Override
     public InviteMessage readEntity(Cursor cursor, int offset) {
         InviteMessage entity = new InviteMessage( //
-            cursor.getLong(offset + 0), // id
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // from
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // reason
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // groupName
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // status
-            cursor.getInt(offset + 5) // type
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // time
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // from
+            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // reason
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // groupName
+            cursor.getInt(offset + 5), // type
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6) // status
         );
         return entity;
     }
      
     @Override
     public void readEntity(Cursor cursor, InviteMessage entity, int offset) {
-        entity.setId(cursor.getLong(offset + 0));
-        entity.setFrom(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setReason(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setGroupName(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setStatus(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
+        entity.setTime(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setFrom(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setReason(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setGroupName(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setType(cursor.getInt(offset + 5));
+        entity.setStatus(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
      }
     
     @Override
@@ -158,7 +180,7 @@ public class InviteMessageDao extends AbstractDao<InviteMessage, Long> {
 
     @Override
     public boolean hasKey(InviteMessage entity) {
-        throw new UnsupportedOperationException("Unsupported for entities with a non-null key");
+        return entity.getId() != null;
     }
 
     @Override

@@ -50,8 +50,7 @@ public class MessageActivity extends AppCompatActivity {
         });
         mMsgRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mMsgRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-
-        mMsgRecyclerView.setAdapter(new MessageAdapter(mInviteMessageList));
+        mMsgRecyclerView.setAdapter(new MessageAdapter(mInviteMessageList,this));
     }
 
     private void getAllMessage(){
