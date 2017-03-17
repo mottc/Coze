@@ -1,8 +1,6 @@
 package com.mottc.coze.message;
 
-import android.app.NotificationManager;
 import android.content.Context;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -28,8 +26,8 @@ import butterknife.ButterKnife;
 /**
  * Created with Android Studio
  * User: mottc
- * Date: 2017/3/10
- * Time: 20:39
+ * Date: 2017/3/17
+ * Time: 21:41
  */
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
 
@@ -37,7 +35,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     private InviteMessageDao mInviteMessageDao;
     private Context mContext;
 
-    public MessageAdapter(List<InviteMessage> inviteMessageList,Context context) {
+    public MessageAdapter(List<InviteMessage> inviteMessageList, Context context) {
         mInviteMessageList = inviteMessageList;
         mInviteMessageDao = CozeApplication.getInstance().getDaoSession(EMClient.getInstance().getCurrentUser()).getInviteMessageDao();
         mContext = context;
@@ -119,26 +117,106 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                 });
                 break;
             case Constant.USER_INVITE_TO_GROUP:
+                holder.mType.setText("邀请你加入群组-" + inviteMessage.getGroupName());
+                holder.mAgree.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        holder.mAgree.setClickable(false);
+                        holder.mRefuse.setClickable(false);
+                        InviteMessage aNewInviteMessage = new InviteMessage();
+                        aNewInviteMessage.setId(inviteMessage.getId());
+                        aNewInviteMessage.setStatus(Constant.AGREE);
+                        aNewInviteMessage.setFrom(inviteMessage.getFrom());
+                        aNewInviteMessage.setType(inviteMessage.getType());
+                        aNewInviteMessage.setReason(inviteMessage.getReason());
+                        aNewInviteMessage.setGroupId(inviteMessage.getGroupId());
+                        aNewInviteMessage.setGroupName(inviteMessage.getGroupName());
+                        aNewInviteMessage.setTime(inviteMessage.getTime());
 
-               break;
+                        mInviteMessageDao.update(aNewInviteMessage);
+                        try {
+                            EMClient.getInstance().groupManager().acceptInvitation(inviteMessage.getGroupId(), inviteMessage.getFrom());
+                        } catch (HyphenateException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                holder.mRefuse.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        holder.mAgree.setClickable(false);
+                        holder.mRefuse.setClickable(false);
+                        InviteMessage aNewInviteMessage = new InviteMessage();
+                        aNewInviteMessage.setId(inviteMessage.getId());
+                        aNewInviteMessage.setStatus(Constant.REFUSE);
+                        aNewInviteMessage.setFrom(inviteMessage.getFrom());
+                        aNewInviteMessage.setType(inviteMessage.getType());
+                        aNewInviteMessage.setReason(inviteMessage.getReason());
+                        aNewInviteMessage.setGroupName(inviteMessage.getGroupName());
+                        aNewInviteMessage.setGroupId(inviteMessage.getGroupId());
+                        aNewInviteMessage.setTime(inviteMessage.getTime());
+                        mInviteMessageDao.update(aNewInviteMessage);
+                        try {
+                            EMClient.getInstance().groupManager().declineInvitation(inviteMessage.getGroupId(), inviteMessage.getFrom(), "");
+                        } catch (HyphenateException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+                break;
             case Constant.USER_WANT_TO_IN_GROUP:
+                holder.mType.setText("申请加入群组-" + inviteMessage.getGroupName());
+                holder.mAgree.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        holder.mAgree.setClickable(false);
+                        holder.mRefuse.setClickable(false);
+                        InviteMessage aNewInviteMessage = new InviteMessage();
+                        aNewInviteMessage.setId(inviteMessage.getId());
+                        aNewInviteMessage.setStatus(Constant.AGREE);
+                        aNewInviteMessage.setFrom(inviteMessage.getFrom());
+                        aNewInviteMessage.setType(inviteMessage.getType());
+                        aNewInviteMessage.setReason(inviteMessage.getReason());
+                        aNewInviteMessage.setGroupId(inviteMessage.getGroupId());
+                        aNewInviteMessage.setGroupName(inviteMessage.getGroupName());
+                        aNewInviteMessage.setTime(inviteMessage.getTime());
+
+                        mInviteMessageDao.update(aNewInviteMessage);
+                        try {
+                            EMClient.getInstance().groupManager().acceptApplication(inviteMessage.getFrom(), inviteMessage.getGroupId());
+                        } catch (HyphenateException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                holder.mRefuse.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        holder.mAgree.setClickable(false);
+                        holder.mRefuse.setClickable(false);
+                        InviteMessage aNewInviteMessage = new InviteMessage();
+                        aNewInviteMessage.setId(inviteMessage.getId());
+                        aNewInviteMessage.setStatus(Constant.REFUSE);
+                        aNewInviteMessage.setFrom(inviteMessage.getFrom());
+                        aNewInviteMessage.setType(inviteMessage.getType());
+                        aNewInviteMessage.setReason(inviteMessage.getReason());
+                        aNewInviteMessage.setGroupName(inviteMessage.getGroupName());
+                        aNewInviteMessage.setGroupId(inviteMessage.getGroupId());
+                        aNewInviteMessage.setTime(inviteMessage.getTime());
+                        mInviteMessageDao.update(aNewInviteMessage);
+                        try {
+                            EMClient.getInstance().groupManager().declineApplication(inviteMessage.getFrom(), inviteMessage.getGroupId(), "");
+                        } catch (HyphenateException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
                 break;
 
         }
 
-        holder.mCardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext)
-                        .setSmallIcon(R.drawable.add)
-                        .setContentTitle("***")
-                        .setContentText("请求加你为好友")
-                        .setAutoCancel(true);
-//TODO
-                NotificationManager manager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-                manager.notify(1, builder.build());
-            }
-        });
+
         holder.mCardView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -152,8 +230,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     public int getItemCount() {
         return mInviteMessageList.size();
     }
-
-
 
 
     public class ViewHolder extends RecyclerView.ViewHolder {

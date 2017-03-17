@@ -17,8 +17,6 @@ import com.hyphenate.exceptions.HyphenateException;
 import com.mottc.coze.CozeApplication;
 import com.mottc.coze.R;
 import com.mottc.coze.bean.CozeUser;
-import com.mottc.coze.db.CozeUserDao;
-import com.mottc.coze.db.DaoSession;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -22,8 +22,6 @@ import com.hyphenate.exceptions.HyphenateException;
 import com.mottc.coze.CozeApplication;
 import com.mottc.coze.R;
 import com.mottc.coze.bean.CozeUser;
-import com.mottc.coze.db.CozeUserDao;
-import com.mottc.coze.db.DaoSession;
 import com.mottc.coze.main.MainActivity;
 import com.mottc.coze.utils.AvatarUtils;
 import com.qiniu.android.http.ResponseInfo;
@@ -99,7 +97,6 @@ public class UploadAvatarActivity extends AppCompatActivity {
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
-
     }
 
     public void startPhotoZoom(Uri uri) {
@@ -142,9 +139,6 @@ public class UploadAvatarActivity extends AppCompatActivity {
         mUploadManager.put(data, upkey, token, new UpCompletionHandler() {
             public void complete(String key, ResponseInfo rinfo, JSONObject response) {
 
-//                Toast.makeText(UploadAvatarActivity.this, "头像上传成功", Toast.LENGTH_SHORT).show();
-                // 调用sdk登陆方法登陆聊天服务器
-//                mUploading.setVisibility(View.GONE);
                 EMClient.getInstance().login(username, password, new EMCallBack() {
 
                     @Override

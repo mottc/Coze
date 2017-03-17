@@ -29,8 +29,9 @@ public class InviteMessageDao extends AbstractDao<InviteMessage, Long> {
         public final static Property From = new Property(2, String.class, "from", false, "FROM");
         public final static Property Reason = new Property(3, String.class, "reason", false, "REASON");
         public final static Property GroupName = new Property(4, String.class, "groupName", false, "GROUP_NAME");
-        public final static Property Type = new Property(5, int.class, "type", false, "TYPE");
-        public final static Property Status = new Property(6, String.class, "status", false, "STATUS");
+        public final static Property GroupId = new Property(5, String.class, "groupId", false, "GROUP_ID");
+        public final static Property Type = new Property(6, int.class, "type", false, "TYPE");
+        public final static Property Status = new Property(7, String.class, "status", false, "STATUS");
     }
 
 
@@ -51,8 +52,9 @@ public class InviteMessageDao extends AbstractDao<InviteMessage, Long> {
                 "\"FROM\" TEXT," + // 2: from
                 "\"REASON\" TEXT," + // 3: reason
                 "\"GROUP_NAME\" TEXT," + // 4: groupName
-                "\"TYPE\" INTEGER NOT NULL ," + // 5: type
-                "\"STATUS\" TEXT);"); // 6: status
+                "\"GROUP_ID\" TEXT," + // 5: groupId
+                "\"TYPE\" INTEGER NOT NULL ," + // 6: type
+                "\"STATUS\" TEXT);"); // 7: status
     }
 
     /** Drops the underlying database table. */
@@ -89,11 +91,16 @@ public class InviteMessageDao extends AbstractDao<InviteMessage, Long> {
         if (groupName != null) {
             stmt.bindString(5, groupName);
         }
-        stmt.bindLong(6, entity.getType());
+ 
+        String groupId = entity.getGroupId();
+        if (groupId != null) {
+            stmt.bindString(6, groupId);
+        }
+        stmt.bindLong(7, entity.getType());
  
         String status = entity.getStatus();
         if (status != null) {
-            stmt.bindString(7, status);
+            stmt.bindString(8, status);
         }
     }
 
@@ -125,11 +132,16 @@ public class InviteMessageDao extends AbstractDao<InviteMessage, Long> {
         if (groupName != null) {
             stmt.bindString(5, groupName);
         }
-        stmt.bindLong(6, entity.getType());
+ 
+        String groupId = entity.getGroupId();
+        if (groupId != null) {
+            stmt.bindString(6, groupId);
+        }
+        stmt.bindLong(7, entity.getType());
  
         String status = entity.getStatus();
         if (status != null) {
-            stmt.bindString(7, status);
+            stmt.bindString(8, status);
         }
     }
 
@@ -146,8 +158,9 @@ public class InviteMessageDao extends AbstractDao<InviteMessage, Long> {
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // from
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // reason
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // groupName
-            cursor.getInt(offset + 5), // type
-            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6) // status
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // groupId
+            cursor.getInt(offset + 6), // type
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7) // status
         );
         return entity;
     }
@@ -159,8 +172,9 @@ public class InviteMessageDao extends AbstractDao<InviteMessage, Long> {
         entity.setFrom(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setReason(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setGroupName(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setType(cursor.getInt(offset + 5));
-        entity.setStatus(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setGroupId(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setType(cursor.getInt(offset + 6));
+        entity.setStatus(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
      }
     
     @Override

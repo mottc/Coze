@@ -11,8 +11,9 @@ import com.hyphenate.util.PathUtil;
 import com.mottc.coze.Constant;
 import com.mottc.coze.CozeApplication;
 import com.mottc.coze.bean.CozeUser;
-import com.mottc.coze.db.CozeUserDao;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -71,6 +72,11 @@ public class CommonUtils {
         String path = PathUtil.getInstance().getImagePath()+"/"+ "th"+thumbImageName;
         EMLog.d("msg", "thum image path:" + path);
         return path;
+    }
+    public static String getTime() {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");
+        Date curDate = new Date(System.currentTimeMillis());
+        return formatter.format(curDate);
     }
 
 }

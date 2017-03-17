@@ -1,7 +1,9 @@
 package com.mottc.coze.main;
 
 import android.app.ActivityOptions;
+import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -37,15 +39,14 @@ import com.mottc.coze.chat.ChatActivity;
 import com.mottc.coze.db.CozeUserDao;
 import com.mottc.coze.db.InviteMessageDao;
 import com.mottc.coze.message.MessageActivity;
+import com.mottc.coze.utils.CommonUtils;
 import com.mxn.soul.flowingdrawer_core.FlowingDrawer;
 import com.yalantis.contextmenu.lib.ContextMenuDialogFragment;
 import com.yalantis.contextmenu.lib.MenuObject;
 import com.yalantis.contextmenu.lib.MenuParams;
 import com.yalantis.contextmenu.lib.interfaces.OnMenuItemClickListener;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -72,12 +73,14 @@ public class MainActivity extends AppCompatActivity
     private FragmentManager fragmentManager;
     private InviteMessageDao mInviteMessageDao;
     private CozeUserDao mCozeUserDao;
+    private NotificationManager mNotificationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         fragmentManager = getSupportFragmentManager();
         mInviteMessageDao = CozeApplication.getInstance().getDaoSession(EMClient.getInstance().getCurrentUser()).getInviteMessageDao();
         mCozeUserDao = CozeApplication.getInstance().getDaoSession(EMClient.getInstance().getCurrentUser()).getCozeUserDao();
@@ -310,7 +313,6 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onContactAdded(String username) {
             mCozeUserDao.insertOrReplace(new CozeUser(null, username, null, null));
-
         }
 
         @Override
@@ -322,49 +324,58 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onContactInvited(String username, String reason) {
 
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");
-            Date curDate = new Date(System.currentTimeMillis());
-            String time = formatter.format(curDate);
+
             // 自己封装的javabean
             InviteMessage msg = new InviteMessage();
             msg.setFrom(username);
             msg.setReason(reason);
             msg.setType(Constant.USER_WANT_TO_BE_FRIEND);
-            msg.setTime(time);
+            msg.setTime(CommonUtils.getTime());
             msg.setStatus(Constant.UNDO);
             mInviteMessageDao.insert(msg);
-//            TODO:通知
+
+            notificationWithIntent(username+"请求加你为好友", reason);
 
         }
 
         @Override
-        public void onFriendRequestAccepted(final String username) {
+        public void onFriendRequestAccepted(String username) {
+            notificationWithoutIntent(username,"同意了你的好友请求");
+        }
+
+        @Override
+        public void onFriendRequestDeclined(String username) {
+            notificationWithoutIntent(username,"拒绝了你的好友请求");
+        }
+
+        public void notificationWithIntent(String title, String text) {
+            Intent intent = new Intent(mContext, MessageActivity.class);
+            //TODO:参数
+            PendingIntent pIntent = PendingIntent.getActivity(mContext, 1, intent, 0);
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext)
-                    .setSmallIcon(R.drawable.add)
-                    .setContentTitle(username)
-                    .setContentText("请求加你为好友")
+                    .setSmallIcon(R.drawable.myicon)
+                    .setContentTitle(title)
+                    .setContentText(text)
+                    .setPriority(Notification.PRIORITY_HIGH)
+                    .setDefaults(Notification.DEFAULT_ALL)
+                    .setContentIntent(pIntent)
                     .setAutoCancel(true);
+            mNotificationManager.notify((int) System.currentTimeMillis(), builder.build());
 
-            NotificationManager manager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-            manager.notify(1, builder.build());
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(mContext, username + "同意了你的好友请求", Toast.LENGTH_SHORT).show();
-
-                }
-            });
         }
 
-        @Override
-        public void onFriendRequestDeclined(final String username) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(mContext, username + "拒绝了你的好友请求", Toast.LENGTH_SHORT).show();
-                }
-            });
+        public void notificationWithoutIntent(String title, String text) {
+
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext)
+                    .setSmallIcon(R.drawable.myicon)
+                    .setContentTitle(title)
+                    .setContentText(text)
+                    .setPriority(Notification.PRIORITY_HIGH)
+                    .setDefaults(Notification.DEFAULT_ALL)
+                    .setAutoCancel(true);
+            mNotificationManager.notify((int) System.currentTimeMillis(), builder.build());
+
         }
     }
 
@@ -381,11 +392,18 @@ public class MainActivity extends AppCompatActivity
             InviteMessage inviteMessage = new InviteMessage();
             inviteMessage.setFrom(inviter);
             inviteMessage.setGroupName(groupName);
+            inviteMessage.setGroupId(groupId);
             inviteMessage.setReason(reason);
+            inviteMessage.setTime(CommonUtils.getTime());
             inviteMessage.setType(Constant.USER_INVITE_TO_GROUP);
             inviteMessage.setStatus(Constant.UNDO);
             mInviteMessageDao.insert(inviteMessage);
+
+            notificationWithIntent(inviter+"邀请你加入群组-"+groupName,reason);
+
         }
+
+
 
         @Override
         public void onRequestToJoinReceived(String groupId, String groupName, String applicant, String reason) {
@@ -393,60 +411,39 @@ public class MainActivity extends AppCompatActivity
             InviteMessage inviteMessage = new InviteMessage();
             inviteMessage.setFrom(applicant);
             inviteMessage.setGroupName(groupName);
+            inviteMessage.setGroupId(groupId);
             inviteMessage.setReason(reason);
+            inviteMessage.setTime(CommonUtils.getTime());
             inviteMessage.setType(Constant.USER_WANT_TO_IN_GROUP);
             inviteMessage.setStatus(Constant.UNDO);
             mInviteMessageDao.insert(inviteMessage);
+            notificationWithIntent(applicant+"申请加入群组-"+groupName,reason);
+        }
+
+        @Override
+        public void onRequestToJoinAccepted(String groupId, String groupName, String accepter) {
+
+            notificationWithoutIntent(accepter,"已同意你加入" + groupName);
 
         }
 
         @Override
-        public void onRequestToJoinAccepted(String groupId, final String groupName, final String accepter) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(mContext, accepter + "已同意你加入" + groupName, Toast.LENGTH_SHORT).show();
+        public void onRequestToJoinDeclined(String groupId, String groupName, String decliner, String reason) {
 
-                }
-            });
-
+            notificationWithoutIntent(decliner,"已拒绝你加入" + groupName);
         }
 
         @Override
-        public void onRequestToJoinDeclined(String groupId, final String groupName, final String decliner, String reason) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
+        public void onInvitationAccepted(String groupId, String invitee, String reason) {
 
-                    Toast.makeText(mContext, decliner + "已拒绝你加入" + groupName, Toast.LENGTH_SHORT).show();
-
-                }
-            });
-        }
-
-        @Override
-        public void onInvitationAccepted(String groupId, final String invitee, String reason) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-
-                    Toast.makeText(mContext, invitee + "已同意你的加群邀请", Toast.LENGTH_SHORT).show();
-
-                }
-            });
+            notificationWithoutIntent(invitee,"接受了你的加群邀请");
         }
 
 
         @Override
-        public void onInvitationDeclined(String groupId, final String invitee, String reason) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
+        public void onInvitationDeclined(String groupId, String invitee, String reason) {
 
-                    Toast.makeText(mContext, invitee + "拒绝了你的加群邀请", Toast.LENGTH_SHORT).show();
-
-                }
-            });
+            notificationWithoutIntent(invitee,"拒绝了你的加群邀请");
         }
 
         @Override
@@ -461,6 +458,35 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         public void onAutoAcceptInvitationFromGroup(String groupId, String inviter, String inviteMessage) {
+
+        }
+
+        private void notificationWithIntent(String title, String text) {
+            Intent intent = new Intent(mContext, MessageActivity.class);
+            //TODO:参数
+            PendingIntent pIntent = PendingIntent.getActivity(mContext, 1, intent, 0);
+
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext)
+                    .setSmallIcon(R.drawable.myicon)
+                    .setContentTitle(title)
+                    .setContentText(text)
+                    .setPriority(Notification.PRIORITY_HIGH)
+                    .setDefaults(Notification.DEFAULT_ALL)
+                    .setContentIntent(pIntent)
+                    .setAutoCancel(true);
+            mNotificationManager.notify((int) System.currentTimeMillis(), builder.build());
+
+        }
+        public void notificationWithoutIntent(String title, String text) {
+
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext)
+                    .setSmallIcon(R.drawable.myicon)
+                    .setContentTitle(title)
+                    .setContentText(text)
+                    .setPriority(Notification.PRIORITY_HIGH)
+                    .setDefaults(Notification.DEFAULT_ALL)
+                    .setAutoCancel(true);
+            mNotificationManager.notify((int) System.currentTimeMillis(), builder.build());
 
         }
     }
