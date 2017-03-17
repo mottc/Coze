@@ -18,6 +18,7 @@ import com.mottc.coze.R;
 import com.mottc.coze.add.AddNewFriendActivity;
 import com.mottc.coze.bean.CozeUser;
 import com.mottc.coze.chat.ChatActivity;
+import com.mottc.coze.db.CozeUserDao;
 import com.mottc.coze.utils.AvatarUtils;
 
 import java.util.List;

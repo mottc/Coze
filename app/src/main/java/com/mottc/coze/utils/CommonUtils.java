@@ -11,6 +11,7 @@ import com.hyphenate.util.PathUtil;
 import com.mottc.coze.Constant;
 import com.mottc.coze.CozeApplication;
 import com.mottc.coze.bean.CozeUser;
+import com.mottc.coze.db.CozeUserDao;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
