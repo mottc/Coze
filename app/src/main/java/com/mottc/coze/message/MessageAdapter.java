@@ -10,8 +10,10 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.hyphenate.EMCallBack;
+import com.hyphenate.EMValueCallBack;
 import com.hyphenate.chat.EMClient;
-import com.hyphenate.exceptions.HyphenateException;
+import com.hyphenate.chat.EMGroup;
 import com.mottc.coze.Constant;
 import com.mottc.coze.CozeApplication;
 import com.mottc.coze.R;
@@ -77,21 +79,33 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                     public void onClick(View v) {
                         holder.mAgree.setClickable(false);
                         holder.mRefuse.setClickable(false);
-                        InviteMessage aNewInviteMessage = new InviteMessage();
-                        aNewInviteMessage.setId(inviteMessage.getId());
-                        aNewInviteMessage.setStatus(Constant.AGREE);
-                        aNewInviteMessage.setFrom(inviteMessage.getFrom());
-                        aNewInviteMessage.setType(inviteMessage.getType());
-                        aNewInviteMessage.setReason(inviteMessage.getReason());
-                        aNewInviteMessage.setGroupName(inviteMessage.getGroupName());
-                        aNewInviteMessage.setTime(inviteMessage.getTime());
 
-                        mInviteMessageDao.update(aNewInviteMessage);
-                        try {
-                            EMClient.getInstance().contactManager().acceptInvitation(mInviteMessageList.get(position).getFrom());
-                        } catch (HyphenateException e) {
-                            e.printStackTrace();
-                        }
+
+                            EMClient.getInstance().contactManager().asyncAcceptInvitation(inviteMessage.getFrom(), new EMCallBack() {
+                                @Override
+                                public void onSuccess() {
+                                    InviteMessage aNewInviteMessage = new InviteMessage();
+                                    aNewInviteMessage.setId(inviteMessage.getId());
+                                    aNewInviteMessage.setStatus(Constant.AGREE);
+                                    aNewInviteMessage.setFrom(inviteMessage.getFrom());
+                                    aNewInviteMessage.setType(inviteMessage.getType());
+                                    aNewInviteMessage.setReason(inviteMessage.getReason());
+                                    aNewInviteMessage.setGroupName(inviteMessage.getGroupName());
+                                    aNewInviteMessage.setTime(inviteMessage.getTime());
+
+                                    mInviteMessageDao.update(aNewInviteMessage);
+                                }
+
+                                @Override
+                                public void onError(int code, String error) {
+
+                                }
+
+                                @Override
+                                public void onProgress(int progress, String status) {
+
+                                }
+                            });
                     }
                 });
                 holder.mRefuse.setOnClickListener(new View.OnClickListener() {
@@ -99,20 +113,31 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                     public void onClick(View v) {
                         holder.mAgree.setClickable(false);
                         holder.mRefuse.setClickable(false);
-                        InviteMessage aNewInviteMessage = new InviteMessage();
-                        aNewInviteMessage.setId(inviteMessage.getId());
-                        aNewInviteMessage.setStatus(Constant.REFUSE);
-                        aNewInviteMessage.setFrom(inviteMessage.getFrom());
-                        aNewInviteMessage.setType(inviteMessage.getType());
-                        aNewInviteMessage.setReason(inviteMessage.getReason());
-                        aNewInviteMessage.setGroupName(inviteMessage.getGroupName());
-                        aNewInviteMessage.setTime(inviteMessage.getTime());
-                        mInviteMessageDao.update(aNewInviteMessage);
-                        try {
-                            EMClient.getInstance().contactManager().declineInvitation(mInviteMessageList.get(position).getFrom());
-                        } catch (HyphenateException e) {
-                            e.printStackTrace();
-                        }
+
+                        EMClient.getInstance().contactManager().asyncDeclineInvitation(inviteMessage.getFrom(), new EMCallBack() {
+                            @Override
+                            public void onSuccess() {
+                                InviteMessage aNewInviteMessage = new InviteMessage();
+                                aNewInviteMessage.setId(inviteMessage.getId());
+                                aNewInviteMessage.setStatus(Constant.REFUSE);
+                                aNewInviteMessage.setFrom(inviteMessage.getFrom());
+                                aNewInviteMessage.setType(inviteMessage.getType());
+                                aNewInviteMessage.setReason(inviteMessage.getReason());
+                                aNewInviteMessage.setGroupName(inviteMessage.getGroupName());
+                                aNewInviteMessage.setTime(inviteMessage.getTime());
+                                mInviteMessageDao.update(aNewInviteMessage);
+                            }
+
+                            @Override
+                            public void onError(int code, String error) {
+
+                            }
+
+                            @Override
+                            public void onProgress(int progress, String status) {
+
+                            }
+                        });
                     }
                 });
                 break;
@@ -123,22 +148,27 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                     public void onClick(View v) {
                         holder.mAgree.setClickable(false);
                         holder.mRefuse.setClickable(false);
-                        InviteMessage aNewInviteMessage = new InviteMessage();
-                        aNewInviteMessage.setId(inviteMessage.getId());
-                        aNewInviteMessage.setStatus(Constant.AGREE);
-                        aNewInviteMessage.setFrom(inviteMessage.getFrom());
-                        aNewInviteMessage.setType(inviteMessage.getType());
-                        aNewInviteMessage.setReason(inviteMessage.getReason());
-                        aNewInviteMessage.setGroupId(inviteMessage.getGroupId());
-                        aNewInviteMessage.setGroupName(inviteMessage.getGroupName());
-                        aNewInviteMessage.setTime(inviteMessage.getTime());
 
-                        mInviteMessageDao.update(aNewInviteMessage);
-                        try {
-                            EMClient.getInstance().groupManager().acceptInvitation(inviteMessage.getGroupId(), inviteMessage.getFrom());
-                        } catch (HyphenateException e) {
-                            e.printStackTrace();
-                        }
+                        EMClient.getInstance().groupManager().asyncAcceptInvitation(inviteMessage.getGroupId(), inviteMessage.getFrom(), new EMValueCallBack<EMGroup>() {
+                            @Override
+                            public void onSuccess(EMGroup value) {
+                                InviteMessage aNewInviteMessage = new InviteMessage();
+                                aNewInviteMessage.setId(inviteMessage.getId());
+                                aNewInviteMessage.setStatus(Constant.AGREE);
+                                aNewInviteMessage.setFrom(inviteMessage.getFrom());
+                                aNewInviteMessage.setType(inviteMessage.getType());
+                                aNewInviteMessage.setReason(inviteMessage.getReason());
+                                aNewInviteMessage.setGroupId(inviteMessage.getGroupId());
+                                aNewInviteMessage.setGroupName(inviteMessage.getGroupName());
+                                aNewInviteMessage.setTime(inviteMessage.getTime());
+                                mInviteMessageDao.update(aNewInviteMessage);
+                            }
+
+                            @Override
+                            public void onError(int error, String errorMsg) {
+
+                            }
+                        });
                     }
                 });
                 holder.mRefuse.setOnClickListener(new View.OnClickListener() {
@@ -146,21 +176,32 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                     public void onClick(View v) {
                         holder.mAgree.setClickable(false);
                         holder.mRefuse.setClickable(false);
-                        InviteMessage aNewInviteMessage = new InviteMessage();
-                        aNewInviteMessage.setId(inviteMessage.getId());
-                        aNewInviteMessage.setStatus(Constant.REFUSE);
-                        aNewInviteMessage.setFrom(inviteMessage.getFrom());
-                        aNewInviteMessage.setType(inviteMessage.getType());
-                        aNewInviteMessage.setReason(inviteMessage.getReason());
-                        aNewInviteMessage.setGroupName(inviteMessage.getGroupName());
-                        aNewInviteMessage.setGroupId(inviteMessage.getGroupId());
-                        aNewInviteMessage.setTime(inviteMessage.getTime());
-                        mInviteMessageDao.update(aNewInviteMessage);
-                        try {
-                            EMClient.getInstance().groupManager().declineInvitation(inviteMessage.getGroupId(), inviteMessage.getFrom(), "");
-                        } catch (HyphenateException e) {
-                            e.printStackTrace();
-                        }
+                        EMClient.getInstance().groupManager().asyncDeclineInvitation(inviteMessage.getGroupId(), inviteMessage.getFrom(), "", new EMCallBack() {
+                            @Override
+                            public void onSuccess() {
+                                InviteMessage aNewInviteMessage = new InviteMessage();
+                                aNewInviteMessage.setId(inviteMessage.getId());
+                                aNewInviteMessage.setStatus(Constant.REFUSE);
+                                aNewInviteMessage.setFrom(inviteMessage.getFrom());
+                                aNewInviteMessage.setType(inviteMessage.getType());
+                                aNewInviteMessage.setReason(inviteMessage.getReason());
+                                aNewInviteMessage.setGroupName(inviteMessage.getGroupName());
+                                aNewInviteMessage.setGroupId(inviteMessage.getGroupId());
+                                aNewInviteMessage.setTime(inviteMessage.getTime());
+                                mInviteMessageDao.update(aNewInviteMessage);
+                            }
+
+                            @Override
+                            public void onError(int code, String error) {
+
+                            }
+
+                            @Override
+                            public void onProgress(int progress, String status) {
+
+                            }
+                        });
+
                     }
                 });
 
@@ -172,22 +213,35 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                     public void onClick(View v) {
                         holder.mAgree.setClickable(false);
                         holder.mRefuse.setClickable(false);
-                        InviteMessage aNewInviteMessage = new InviteMessage();
-                        aNewInviteMessage.setId(inviteMessage.getId());
-                        aNewInviteMessage.setStatus(Constant.AGREE);
-                        aNewInviteMessage.setFrom(inviteMessage.getFrom());
-                        aNewInviteMessage.setType(inviteMessage.getType());
-                        aNewInviteMessage.setReason(inviteMessage.getReason());
-                        aNewInviteMessage.setGroupId(inviteMessage.getGroupId());
-                        aNewInviteMessage.setGroupName(inviteMessage.getGroupName());
-                        aNewInviteMessage.setTime(inviteMessage.getTime());
 
-                        mInviteMessageDao.update(aNewInviteMessage);
-                        try {
-                            EMClient.getInstance().groupManager().acceptApplication(inviteMessage.getFrom(), inviteMessage.getGroupId());
-                        } catch (HyphenateException e) {
-                            e.printStackTrace();
-                        }
+
+                        EMClient.getInstance().groupManager().asyncAcceptApplication(inviteMessage.getFrom(), inviteMessage.getGroupId(), new EMCallBack() {
+                            @Override
+                            public void onSuccess() {
+
+                                InviteMessage aNewInviteMessage = new InviteMessage();
+                                aNewInviteMessage.setId(inviteMessage.getId());
+                                aNewInviteMessage.setStatus(Constant.AGREE);
+                                aNewInviteMessage.setFrom(inviteMessage.getFrom());
+                                aNewInviteMessage.setType(inviteMessage.getType());
+                                aNewInviteMessage.setReason(inviteMessage.getReason());
+                                aNewInviteMessage.setGroupId(inviteMessage.getGroupId());
+                                aNewInviteMessage.setGroupName(inviteMessage.getGroupName());
+                                aNewInviteMessage.setTime(inviteMessage.getTime());
+                                mInviteMessageDao.update(aNewInviteMessage);
+                            }
+
+                            @Override
+                            public void onError(int code, String error) {
+
+                            }
+
+                            @Override
+                            public void onProgress(int progress, String status) {
+
+                            }
+                        });
+
                     }
                 });
                 holder.mRefuse.setOnClickListener(new View.OnClickListener() {
@@ -195,21 +249,35 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                     public void onClick(View v) {
                         holder.mAgree.setClickable(false);
                         holder.mRefuse.setClickable(false);
-                        InviteMessage aNewInviteMessage = new InviteMessage();
-                        aNewInviteMessage.setId(inviteMessage.getId());
-                        aNewInviteMessage.setStatus(Constant.REFUSE);
-                        aNewInviteMessage.setFrom(inviteMessage.getFrom());
-                        aNewInviteMessage.setType(inviteMessage.getType());
-                        aNewInviteMessage.setReason(inviteMessage.getReason());
-                        aNewInviteMessage.setGroupName(inviteMessage.getGroupName());
-                        aNewInviteMessage.setGroupId(inviteMessage.getGroupId());
-                        aNewInviteMessage.setTime(inviteMessage.getTime());
-                        mInviteMessageDao.update(aNewInviteMessage);
-                        try {
-                            EMClient.getInstance().groupManager().declineApplication(inviteMessage.getFrom(), inviteMessage.getGroupId(), "");
-                        } catch (HyphenateException e) {
-                            e.printStackTrace();
-                        }
+
+
+                        EMClient.getInstance().groupManager().asyncDeclineApplication(inviteMessage.getFrom(), inviteMessage.getGroupId(),
+                                "", new EMCallBack() {
+                                    @Override
+                                    public void onSuccess() {
+                                        InviteMessage aNewInviteMessage = new InviteMessage();
+                                        aNewInviteMessage.setId(inviteMessage.getId());
+                                        aNewInviteMessage.setStatus(Constant.REFUSE);
+                                        aNewInviteMessage.setFrom(inviteMessage.getFrom());
+                                        aNewInviteMessage.setType(inviteMessage.getType());
+                                        aNewInviteMessage.setReason(inviteMessage.getReason());
+                                        aNewInviteMessage.setGroupName(inviteMessage.getGroupName());
+                                        aNewInviteMessage.setGroupId(inviteMessage.getGroupId());
+                                        aNewInviteMessage.setTime(inviteMessage.getTime());
+                                        mInviteMessageDao.update(aNewInviteMessage);
+                                    }
+
+                                    @Override
+                                    public void onError(int code, String error) {
+
+                                    }
+
+                                    @Override
+                                    public void onProgress(int progress, String status) {
+
+                                    }
+                                });
+
                     }
                 });
                 break;
