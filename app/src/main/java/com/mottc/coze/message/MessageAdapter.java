@@ -1,5 +1,6 @@
 package com.mottc.coze.message;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -37,11 +38,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     private List<InviteMessage> mInviteMessageList;
     private InviteMessageDao mInviteMessageDao;
     private Context mContext;
+    private Activity mActivity;
 
     public MessageAdapter(List<InviteMessage> inviteMessageList, Context context) {
         mInviteMessageList = inviteMessageList;
         mInviteMessageDao = CozeApplication.getInstance().getDaoSession(EMClient.getInstance().getCurrentUser()).getInviteMessageDao();
         mContext = context;
+        mActivity = (Activity) context;
     }
 
 
@@ -93,7 +96,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                                 aNewInviteMessage.setTime(inviteMessage.getTime());
 
                                 mInviteMessageDao.update(aNewInviteMessage);
-                                Toast.makeText(mContext, "成功", Toast.LENGTH_SHORT).show();
+                                mActivity.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        holder.mUndo.setVisibility(View.GONE);
+                                        holder.mDone.setVisibility(View.VISIBLE);
+                                        holder.mDone.setText(R.string.agree);
+                                    }
+                                });
 
                             }
 
@@ -129,7 +139,15 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                                 aNewInviteMessage.setGroupName(inviteMessage.getGroupName());
                                 aNewInviteMessage.setTime(inviteMessage.getTime());
                                 mInviteMessageDao.update(aNewInviteMessage);
-                                Toast.makeText(mContext, "成功", Toast.LENGTH_SHORT).show();
+                                mActivity.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        holder.mUndo.setVisibility(View.GONE);
+                                        holder.mDone.setVisibility(View.VISIBLE);
+                                        holder.mDone.setText(R.string.refuse);
+                                    }
+                                });
+
 
                             }
 
@@ -170,7 +188,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                                 aNewInviteMessage.setGroupName(inviteMessage.getGroupName());
                                 aNewInviteMessage.setTime(inviteMessage.getTime());
                                 mInviteMessageDao.update(aNewInviteMessage);
-                                Toast.makeText(mContext, "成功", Toast.LENGTH_SHORT).show();
+                                mActivity.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        holder.mUndo.setVisibility(View.GONE);
+                                        holder.mDone.setVisibility(View.VISIBLE);
+                                        holder.mDone.setText(R.string.agree);
+                                    }
+                                });
 
                             }
 
@@ -202,7 +227,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                                 aNewInviteMessage.setGroupId(inviteMessage.getGroupId());
                                 aNewInviteMessage.setTime(inviteMessage.getTime());
                                 mInviteMessageDao.update(aNewInviteMessage);
-                                Toast.makeText(mContext, "成功", Toast.LENGTH_SHORT).show();
+                                mActivity.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        holder.mUndo.setVisibility(View.GONE);
+                                        holder.mDone.setVisibility(View.VISIBLE);
+                                        holder.mDone.setText(R.string.refuse);
+                                    }
+                                });
 
                             }
 
@@ -247,7 +279,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                                 aNewInviteMessage.setGroupName(inviteMessage.getGroupName());
                                 aNewInviteMessage.setTime(inviteMessage.getTime());
                                 mInviteMessageDao.update(aNewInviteMessage);
-                                Toast.makeText(mContext, "成功", Toast.LENGTH_SHORT).show();
+                                mActivity.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        holder.mUndo.setVisibility(View.GONE);
+                                        holder.mDone.setVisibility(View.VISIBLE);
+                                        holder.mDone.setText(R.string.agree);
+                                    }
+                                });
 
                             }
 
@@ -288,7 +327,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                                         aNewInviteMessage.setGroupId(inviteMessage.getGroupId());
                                         aNewInviteMessage.setTime(inviteMessage.getTime());
                                         mInviteMessageDao.update(aNewInviteMessage);
-                                        Toast.makeText(mContext, "成功", Toast.LENGTH_SHORT).show();
+                                        mActivity.runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                holder.mUndo.setVisibility(View.GONE);
+                                                holder.mDone.setVisibility(View.VISIBLE);
+                                                holder.mDone.setText(R.string.refuse);
+                                            }
+                                        });
 
                                     }
 
