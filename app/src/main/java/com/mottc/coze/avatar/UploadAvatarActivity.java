@@ -88,7 +88,7 @@ public class UploadAvatarActivity extends AppCompatActivity {
                     break;
                 case CAMERA_REQUEST_CODE:
                     File picture = new File(
-                            Environment.getExternalStorageDirectory() + "/head/temp.jpg");
+                            Environment.getExternalStorageDirectory().getPath() + "/head/temp.jpg");
                     startPhotoZoom(Uri.fromFile(picture));
                     break;
                 case RESULT_REQUEST_CODE:
@@ -194,7 +194,7 @@ public class UploadAvatarActivity extends AppCompatActivity {
             case R.id.pic_from_camera:
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 intent.putExtra(MediaStore.EXTRA_OUTPUT,
-                        Uri.fromFile(new File(Environment.getExternalStorageDirectory() + "/head/", "temp.jpg")));
+                        Uri.fromFile(new File(Environment.getExternalStorageDirectory().getPath() + "/head/", "temp.jpg")));
                 startActivityForResult(intent, CAMERA_REQUEST_CODE);
                 break;
         }

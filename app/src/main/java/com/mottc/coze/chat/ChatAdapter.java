@@ -154,11 +154,18 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         if (holder instanceof SendImageHolder) {
             SendImageHolder sendImageHolder = (SendImageHolder) holder;
-            EMImageMessageBody emImageMessageBody = (EMImageMessageBody) mValues.get(position).getBody();
+            final EMImageMessageBody emImageMessageBody = (EMImageMessageBody) mValues.get(position).getBody();
             Glide
                     .with(context)
                     .load(emImageMessageBody.getLocalUrl())
                     .into(sendImageHolder.mSendImage);
+
+            sendImageHolder.mSendImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mActivity.startActivity(new Intent(mActivity, ShowImageActivity.class).putExtra("imageUrl",emImageMessageBody.getLocalUrl()));
+                }
+            });
         }
 
         if (holder instanceof ReceiveImageHolder) {
@@ -236,6 +243,12 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
             }
 
+            receiveImageHolder.mReceiveImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mActivity.startActivity(new Intent(mActivity, ShowImageActivity.class).putExtra("imageUrl",emImageMessageBody.getThumbnailUrl()));
+                }
+            });
 
         }
 

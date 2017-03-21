@@ -100,8 +100,12 @@
             android:name=".message.MessageActivity"
             android:theme="@style/ChatActivityTheme">
         </activity>
-        <activity android:name=".avatar.UploadAvatarActivity"
-                  android:theme="@style/ChatActivityTheme">
+        <activity
+            android:name=".avatar.UploadAvatarActivity"
+            android:theme="@style/ChatActivityTheme">
+        </activity>
+        <activity android:name=".chat.ShowImageActivity"
+                  android:theme="@style/ShowImageTheme">
         </activity>
     </application>
 
