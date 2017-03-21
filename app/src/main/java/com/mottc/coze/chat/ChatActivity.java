@@ -3,6 +3,7 @@ package com.mottc.coze.chat;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -30,6 +31,7 @@ import com.mottc.coze.detail.GroupDetailActivity;
 import com.mottc.coze.detail.UserDetailActivity;
 import com.mottc.coze.utils.CommonUtils;
 import com.mottc.coze.utils.DisplayUtils;
+import com.mottc.coze.utils.PermissionsUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -80,8 +82,10 @@ public class ChatActivity extends AppCompatActivity {
     private ChatAdapter mChatAdapter;
     private EMConversation conversation;
     private List<View> hideInputExcludeViews;
+    private String fileName;
     private static final int IMAGE_REQUEST_CODE = 0;
     private static final int CAMERA_REQUEST_CODE = 1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -244,6 +248,7 @@ public class ChatActivity extends AppCompatActivity {
         mTextContent.setText("");
         mTextContent.clearFocus();
     }
+
     private void sendImage(String path) {
         EMMessage message = EMMessage.createImageSendMessage(path, true, toChatUsername);
 
@@ -264,7 +269,7 @@ public class ChatActivity extends AppCompatActivity {
 
             switch (requestCode) {
                 case IMAGE_REQUEST_CODE:
-                    String[] filePathColumn = { MediaStore.Images.Media.DATA };
+                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
                     Cursor cursor = this.getContentResolver().query(data.getData(), filePathColumn, null, null, null);
                     if (cursor != null) {
                         cursor.moveToFirst();
@@ -290,6 +295,14 @@ public class ChatActivity extends AppCompatActivity {
                     }
                     break;
                 case CAMERA_REQUEST_CODE:
+                    File picture = new File(
+                            Environment.getExternalStorageDirectory().getPath() + "/cozePic/" + fileName);
+
+                    sendImage(picture.getAbsolutePath());
+
+//                    sendImage(CommonUtils.getUriForFile(this, picture).getPath());
+
+//                    sendImage(FileProvider.getUriForFile(this,"mottc.provider", picture).getPath());
 
                     break;
             }
@@ -299,8 +312,7 @@ public class ChatActivity extends AppCompatActivity {
     }
 
 
-
-    @OnClick({R.id.image,R.id.voice, R.id.camera, R.id.phone, R.id.video, R.id.send, R.id.add, R.id.remove})
+    @OnClick({R.id.image, R.id.voice, R.id.camera, R.id.phone, R.id.video, R.id.send, R.id.add, R.id.remove})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.image:
@@ -309,13 +321,26 @@ public class ChatActivity extends AppCompatActivity {
 //                intentFromGallery.setAction(Intent.ACTION_GET_CONTENT);
 
 
-
-                Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(intent, IMAGE_REQUEST_CODE);
+                Intent imageIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(imageIntent, IMAGE_REQUEST_CODE);
                 break;
             case R.id.voice:
                 break;
             case R.id.camera:
+
+                PermissionsUtils.verifyStoragePermissions(this);
+                fileName = String.valueOf(System.currentTimeMillis()) + ".jpg";
+                File folder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/cozePic/");
+                if (!folder.exists()) {
+                    folder.mkdirs();//创建文件夹
+                }
+
+                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//                intent.putExtra(MediaStore.EXTRA_OUTPUT,
+//                        Uri.fromFile(new File(Environment.getExternalStorageDirectory().getPath() + "/head/", "temp.jpg")));
+                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+                        CommonUtils.getUriForFile(this, new File(folder.getAbsolutePath(), fileName)));
+                startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
                 break;
             case R.id.phone:
                 break;
@@ -336,6 +361,8 @@ public class ChatActivity extends AppCompatActivity {
                 break;
         }
     }
+
+
 
 
     @Override

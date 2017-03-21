@@ -3,6 +3,9 @@ package com.mottc.coze.utils;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
+import android.os.Build;
+import android.support.v4.content.FileProvider;
 
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMConversation;
@@ -13,6 +16,7 @@ import com.mottc.coze.CozeApplication;
 import com.mottc.coze.bean.CozeUser;
 import com.mottc.coze.db.CozeUserDao;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -80,4 +84,17 @@ public class CommonUtils {
         return formatter.format(curDate);
     }
 
+
+    public static Uri getUriForFile(Context context, File file) {
+        if (context == null || file == null) {
+            throw new NullPointerException();
+        }
+        Uri uri;
+        if (Build.VERSION.SDK_INT >= 24) {
+            uri = FileProvider.getUriForFile(context, "mottc.provider", file);
+        } else {
+            uri = Uri.fromFile(file);
+        }
+        return uri;
+    }
 }

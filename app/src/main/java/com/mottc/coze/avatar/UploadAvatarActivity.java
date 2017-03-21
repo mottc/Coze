@@ -26,6 +26,8 @@ import com.mottc.coze.db.CozeUserDao;
 import com.mottc.coze.db.DaoSession;
 import com.mottc.coze.main.MainActivity;
 import com.mottc.coze.utils.AvatarUtils;
+import com.mottc.coze.utils.CommonUtils;
+import com.mottc.coze.utils.PermissionsUtils;
 import com.qiniu.android.http.ResponseInfo;
 import com.qiniu.android.storage.UpCompletionHandler;
 import com.qiniu.android.storage.UploadManager;
@@ -88,8 +90,8 @@ public class UploadAvatarActivity extends AppCompatActivity {
                     break;
                 case CAMERA_REQUEST_CODE:
                     File picture = new File(
-                            Environment.getExternalStorageDirectory().getPath() + "/head/temp.jpg");
-                    startPhotoZoom(Uri.fromFile(picture));
+                            Environment.getExternalStorageDirectory().getPath() + "/cozePic/avatar.jpg");
+                    startPhotoZoom(CommonUtils.getUriForFile(this,picture));
                     break;
                 case RESULT_REQUEST_CODE:
                     if (data != null) {
@@ -105,6 +107,7 @@ public class UploadAvatarActivity extends AppCompatActivity {
 
         Intent intent = new Intent("com.android.camera.action.CROP");
         intent.setDataAndType(uri, "image/*");
+
         // 设置裁剪
         intent.putExtra("crop", "true");
         // aspectX aspectY 是宽高的比例
@@ -186,19 +189,28 @@ public class UploadAvatarActivity extends AppCompatActivity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.pic_from_image:
-                Intent intentFromGallery = new Intent();
-                intentFromGallery.setType("image/*"); // 设置文件类型
-                intentFromGallery.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(intentFromGallery, IMAGE_REQUEST_CODE);
+//                Intent intentFromGallery = new Intent();
+//                intentFromGallery.setType("image/*"); // 设置文件类型
+//                intentFromGallery.setAction(Intent.ACTION_GET_CONTENT);
+                Intent imageIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(imageIntent, IMAGE_REQUEST_CODE);
                 break;
             case R.id.pic_from_camera:
+
+                PermissionsUtils.verifyStoragePermissions(this);
+                File folder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/cozePic/");
+                if (!folder.exists()) {
+                    folder.mkdirs();//创建文件夹
+                }
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 intent.putExtra(MediaStore.EXTRA_OUTPUT,
-                        Uri.fromFile(new File(Environment.getExternalStorageDirectory().getPath() + "/head/", "temp.jpg")));
+                        CommonUtils.getUriForFile(this, new File(folder.getAbsolutePath(), "avatar.jpg")));
                 startActivityForResult(intent, CAMERA_REQUEST_CODE);
                 break;
         }
     }
+
+
 
 
     private void getFriends() {
