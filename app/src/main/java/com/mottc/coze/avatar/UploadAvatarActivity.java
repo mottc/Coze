@@ -189,9 +189,6 @@ public class UploadAvatarActivity extends AppCompatActivity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.pic_from_image:
-//                Intent intentFromGallery = new Intent();
-//                intentFromGallery.setType("image/*"); // 设置文件类型
-//                intentFromGallery.setAction(Intent.ACTION_GET_CONTENT);
                 Intent imageIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(imageIntent, IMAGE_REQUEST_CODE);
                 break;
