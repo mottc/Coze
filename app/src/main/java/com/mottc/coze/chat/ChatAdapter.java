@@ -16,7 +16,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMFileMessageBody;
@@ -153,12 +152,54 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         if (holder instanceof SendImageHolder) {
-            SendImageHolder sendImageHolder = (SendImageHolder) holder;
+            final SendImageHolder sendImageHolder = (SendImageHolder) holder;
             final EMImageMessageBody emImageMessageBody = (EMImageMessageBody) mValues.get(position).getBody();
-            Glide
-                    .with(context)
-                    .load(emImageMessageBody.getLocalUrl())
-                    .into(sendImageHolder.mSendImage);
+
+            String filePath = emImageMessageBody.getLocalUrl();
+            String thumbPath = CommonUtils.getThumbnailImagePath(emImageMessageBody.getLocalUrl());
+
+            showImageView(thumbPath, sendImageHolder.mSendImage, filePath, mValues.get(position));
+
+            mValues.get(position).setMessageStatusCallback(new EMCallBack() {
+                @Override
+                public void onSuccess() {
+                    mActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            sendImageHolder.mProgressBar.setVisibility(View.GONE);
+                            sendImageHolder.mPercentage.setVisibility(View.GONE);
+                        }
+                    });
+
+                }
+
+                @Override
+                public void onError(int code, String error) {
+
+                    mActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            sendImageHolder.mProgressBar.setVisibility(View.GONE);
+                            sendImageHolder.mPercentage.setVisibility(View.VISIBLE);
+                            sendImageHolder.mPercentage.setText("发送失败");
+                        }
+                    });
+
+                }
+
+                @Override
+                public void onProgress(final int progress, String status) {
+                    mActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            sendImageHolder.mProgressBar.setVisibility(View.VISIBLE);
+                            sendImageHolder.mPercentage.setVisibility(View.VISIBLE);
+                            sendImageHolder.mPercentage.setText(String.valueOf(progress));
+                        }
+                    });
+                }
+            });
+
 
             sendImageHolder.mSendImage.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -215,6 +256,13 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                     @Override
                     public void onError(int code, String error) {
+                        mActivity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                receiveImageHolder.mProgressBar.setVisibility(View.GONE);
+                                receiveImageHolder.mPercentage.setText("接收失败");
+                            }
+                        });
 
                     }
 
