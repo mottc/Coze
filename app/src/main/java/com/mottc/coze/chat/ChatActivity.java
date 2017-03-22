@@ -154,6 +154,13 @@ public class ChatActivity extends AppCompatActivity {
             });
         }
 
+        mVoice.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                return false;
+            }
+        });
 
     }
 
@@ -299,11 +306,6 @@ public class ChatActivity extends AppCompatActivity {
                             Environment.getExternalStorageDirectory().getPath() + "/cozePic/" + fileName);
 
                     sendImage(picture.getAbsolutePath());
-
-//                    sendImage(CommonUtils.getUriForFile(this, picture).getPath());
-
-//                    sendImage(FileProvider.getUriForFile(this,"mottc.provider", picture).getPath());
-
                     break;
             }
         }
@@ -316,15 +318,11 @@ public class ChatActivity extends AppCompatActivity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.image:
-//                Intent intentFromGallery = new Intent();
-//                intentFromGallery.setType("image/*"); // 设置文件类型
-//                intentFromGallery.setAction(Intent.ACTION_GET_CONTENT);
-
-
                 Intent imageIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(imageIntent, IMAGE_REQUEST_CODE);
                 break;
             case R.id.voice:
+
                 break;
             case R.id.camera:
 
@@ -334,10 +332,7 @@ public class ChatActivity extends AppCompatActivity {
                 if (!folder.exists()) {
                     folder.mkdirs();//创建文件夹
                 }
-
                 Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                intent.putExtra(MediaStore.EXTRA_OUTPUT,
-//                        Uri.fromFile(new File(Environment.getExternalStorageDirectory().getPath() + "/head/", "temp.jpg")));
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT,
                         CommonUtils.getUriForFile(this, new File(folder.getAbsolutePath(), fileName)));
                 startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
@@ -355,8 +350,10 @@ public class ChatActivity extends AppCompatActivity {
                 break;
             case R.id.add:
                 mAddChoose.setVisibility(View.VISIBLE);
+                mInputLayout.setVisibility(View.GONE);
                 break;
             case R.id.remove:
+                mInputLayout.setVisibility(View.VISIBLE);
                 mAddChoose.setVisibility(View.GONE);
                 break;
         }

@@ -156,51 +156,68 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             final EMImageMessageBody emImageMessageBody = (EMImageMessageBody) mValues.get(position).getBody();
 
             String filePath = emImageMessageBody.getLocalUrl();
-            String thumbPath = CommonUtils.getThumbnailImagePath(emImageMessageBody.getLocalUrl());
-
+            String thumbPath = CommonUtils.getThumbnailImagePath(filePath);
             showImageView(thumbPath, sendImageHolder.mSendImage, filePath, mValues.get(position));
 
-            mValues.get(position).setMessageStatusCallback(new EMCallBack() {
-                @Override
-                public void onSuccess() {
-                    mActivity.runOnUiThread(new Runnable() {
+            switch (mValues.get(position).status()) {
+                case SUCCESS:
+                    sendImageHolder.mProgressBar.setVisibility(View.INVISIBLE);
+                    sendImageHolder.mPercentage.setVisibility(View.INVISIBLE);
+                    break;
+                case FAIL:
+                    sendImageHolder.mProgressBar.setVisibility(View.INVISIBLE);
+                    sendImageHolder.mPercentage.setVisibility(View.INVISIBLE);
+                    sendImageHolder.mPercentage.setText("发送失败");
+                    break;
+                case INPROGRESS:
+                    sendImageHolder.mProgressBar.setVisibility(View.VISIBLE);
+                    sendImageHolder.mPercentage.setVisibility(View.VISIBLE);
+                    mValues.get(position).setMessageStatusCallback(new EMCallBack() {
                         @Override
-                        public void run() {
-                            sendImageHolder.mProgressBar.setVisibility(View.GONE);
-                            sendImageHolder.mPercentage.setVisibility(View.GONE);
+                        public void onSuccess() {
+                            mActivity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    sendImageHolder.mProgressBar.setVisibility(View.GONE);
+                                    sendImageHolder.mPercentage.setVisibility(View.GONE);
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onError(int code, String error) {
+
+                            mActivity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    sendImageHolder.mSendImage.setImageResource(R.drawable.image);
+                                    sendImageHolder.mProgressBar.setVisibility(View.INVISIBLE);
+                                    sendImageHolder.mPercentage.setVisibility(View.VISIBLE);
+                                    sendImageHolder.mPercentage.setText("发送失败");
+                                }
+                            });
+
+                        }
+
+                        @Override
+                        public void onProgress(final int progress, String status) {
+                            mActivity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    sendImageHolder.mProgressBar.setVisibility(View.VISIBLE);
+                                    sendImageHolder.mPercentage.setVisibility(View.VISIBLE);
+                                    sendImageHolder.mPercentage.setText(String.valueOf(progress));
+                                }
+                            });
                         }
                     });
 
-                }
-
-                @Override
-                public void onError(int code, String error) {
-
-                    mActivity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            sendImageHolder.mSendImage.setImageResource(R.drawable.image);
-                            sendImageHolder.mProgressBar.setVisibility(View.GONE);
-                            sendImageHolder.mPercentage.setVisibility(View.VISIBLE);
-                            sendImageHolder.mPercentage.setText("发送失败");
-                        }
-                    });
-
-                }
-
-                @Override
-                public void onProgress(final int progress, String status) {
-                    mActivity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            sendImageHolder.mProgressBar.setVisibility(View.VISIBLE);
-                            sendImageHolder.mPercentage.setVisibility(View.VISIBLE);
-                            sendImageHolder.mPercentage.setText(String.valueOf(progress));
-                        }
-                    });
-                }
-            });
-
+                    break;
+                default:
+                    sendImageHolder.mProgressBar.setVisibility(View.INVISIBLE);
+                    sendImageHolder.mPercentage.setVisibility(View.INVISIBLE);
+                    break;
+            }
 
             sendImageHolder.mSendImage.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -339,6 +356,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         iv.setImageBitmap(image);
                         ImageCache.getInstance().put(thumbernailPath, image);
                     } else {
+//                        TODO
                         if (message.status() == EMMessage.Status.FAIL) {
                             if (CommonUtils.isNetWorkConnected(context)) {
                                 new Thread(new Runnable() {
@@ -349,7 +367,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                                 }).start();
                             }
                         }
-
                     }
                 }
             }.execute();
