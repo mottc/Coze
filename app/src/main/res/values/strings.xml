@@ -22,7 +22,7 @@
     <string name="create_group">创建群组</string>
     <string name="notification">查看通知</string>
     <string name="userName">用户名:</string>
-    <string name="nickname">昵    称:</string>
+    <string name="nickname">昵称:</string>
     <string name="change_avatar">更换头像</string>
     <string name="change_nickname">修改昵称</string>
     <string name="send_msg">发送消息</string>
@@ -43,4 +43,6 @@
     <string name="message">消息通知</string>
     <string name="agree">已同意</string>
     <string name="refuse">已拒绝</string>
+    <string name="change_group_name">修改群组名称</string>
+    <string name="delete_friend">删除好友</string>
 </resources>

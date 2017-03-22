@@ -21,7 +21,6 @@ import com.mottc.coze.chat.ChatActivity;
 import com.mottc.coze.db.CozeUserDao;
 import com.mottc.coze.utils.AvatarUtils;
 
-import java.util.List;
 import java.util.Objects;
 
 import butterknife.BindView;
@@ -40,10 +39,8 @@ public class UserDetailActivity extends AppCompatActivity {
     CollapsingToolbarLayout mCollapsingToolbar;
     @BindView(R.id.tv_username)
     TextView mTvUsername;
-    @BindView(R.id.tv_nickname)
-    TextView mTvNickname;
-    @BindView(R.id.btn_change_nickname)
-    Button mBtnChangeNickname;
+    @BindView(R.id.btn_delete_friend)
+    Button mBtnDeleteFriend;
     @BindView(R.id.btn_send_msg)
     Button mBtnSendMsg;
     @BindView(R.id.friend_layout)
@@ -54,7 +51,6 @@ public class UserDetailActivity extends AppCompatActivity {
     Button mBtnAddFriend;
 
     private String username;
-    private String nickname;
     private CozeUserDao mCozeUserDao;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +59,6 @@ public class UserDetailActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         username = this.getIntent().getStringExtra("username");
-        nickname = username;
         mCozeUserDao = CozeApplication.getInstance().getDaoSession(EMClient.getInstance().getCurrentUser()).getCozeUserDao();
         initView();
 
@@ -86,7 +81,6 @@ public class UserDetailActivity extends AppCompatActivity {
             for (CozeUser user : mCozeUserDao.loadAll()) {
                 if (user.getUserName().equals(username)) {
                     isStranger = false;
-                    getNickName();
                     mFriendLayout.setVisibility(View.VISIBLE);
                     break;
                 }
@@ -103,26 +97,17 @@ public class UserDetailActivity extends AppCompatActivity {
         mCollapsingToolbar.setExpandedTitleColor(Color.WHITE);
         mCollapsingToolbar.setTitle(username);
         mTvUsername.setText(username);
-        mTvNickname.setText(nickname);
 
         AvatarUtils.setAvatar(this,username,mImage);
     }
 
-    private void getNickName() {
-        List<CozeUser> cozeUserList = mCozeUserDao.queryBuilder()
-                .where(CozeUserDao.Properties.UserName.eq(username))
-                .list();
-        nickname = cozeUserList.get(0).getNickName();
-        if (nickname == null) {
-            nickname = username;
-        }
-    }
 
 
-    @OnClick({R.id.btn_change_nickname, R.id.btn_send_msg, R.id.btn_change_avatar, R.id.btn_add_friend})
+
+    @OnClick({R.id.btn_delete_friend, R.id.btn_send_msg, R.id.btn_change_avatar, R.id.btn_add_friend})
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.btn_change_nickname:
+            case R.id.btn_delete_friend:
 //                TODO
 //                Long id = CommonUtils.getCozeUserFromDB(username).getId();
 //                CozeUser cozeUser = new CozeUser(id, username, "zhangsan", null);

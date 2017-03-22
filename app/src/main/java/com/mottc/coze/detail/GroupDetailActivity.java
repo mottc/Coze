@@ -6,13 +6,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
-import android.widget.ListView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -43,13 +44,18 @@ public class GroupDetailActivity extends AppCompatActivity {
     @BindView(R.id.tv_group_name)
     TextView mTvGroupName;
     @BindView(R.id.group_members)
-    ListView mGroupMembers;
+    RecyclerView mGroupMembers;
     @BindView(R.id.btn_change_group_name)
     Button mBtnChangeGroupName;
     @BindView(R.id.tv_group_members)
     TextView mTvGroupMembers;
     @BindView(R.id.progress_bar)
     ProgressBar mProgressBar;
+    @BindView(R.id.btn_change_group_avatar)
+    Button mBtnChangeGroupAvatar;
+    @BindView(R.id.ownerLayout)
+    LinearLayout mOwnerLayout;
+
 
     private String group_id;
 
@@ -83,11 +89,23 @@ public class GroupDetailActivity extends AppCompatActivity {
         mCollapsingToolbar.setCollapsedTitleTextColor(Color.WHITE);
         mCollapsingToolbar.setExpandedTitleColor(Color.WHITE);
         mTvGroupNum.setText(group_id);
+        mGroupMembers.setLayoutManager(new LinearLayoutManager(this));
+        mGroupMembers.setNestedScrollingEnabled(false);
+        mGroupMembers.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+
 
     }
 
-    @OnClick(R.id.btn_change_group_name)
-    public void onClick() {
+    @OnClick({R.id.btn_change_group_avatar, R.id.btn_change_group_name})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btn_change_group_avatar:
+
+                break;
+            case R.id.btn_change_group_name:
+
+                break;
+        }
     }
 
 
@@ -115,12 +133,12 @@ public class GroupDetailActivity extends AppCompatActivity {
             group_members.clear();
             group_members.addAll(group.getMembers());
             if (Objects.equals(group.getOwner(), EMClient.getInstance().getCurrentUser())) {
-                mBtnChangeGroupName.setVisibility(View.VISIBLE);
+                mOwnerLayout.setVisibility(View.VISIBLE);
             }
             mTvGroupMembers.append(String.valueOf(group.getMemberCount()));
             mCollapsingToolbar.setTitle(group.getGroupName());
             mTvGroupName.setText(group.getGroupName());
-            GroupMembersAdapter groupMembersAdapter = new GroupMembersAdapter(group_members, getBaseContext(), group.getOwner());
+            GroupMembersAdapter groupMembersAdapter = new GroupMembersAdapter(group_members, group.getOwner());
             mGroupMembers.setAdapter(groupMembersAdapter);
             groupMembersAdapter.setOnGroupMembersListClickListener(new GroupMembersAdapter.OnGroupMembersListClickListener() {
                 @Override
@@ -129,24 +147,6 @@ public class GroupDetailActivity extends AppCompatActivity {
                 }
             });
 
-            setListViewHeightBasedOnChildren(mGroupMembers);
         }
-    }
-
-//TODO:高度测量
-    private void setListViewHeightBasedOnChildren(ListView listView) {
-        ListAdapter listAdapter = listView.getAdapter();
-        if (listAdapter == null) {
-            return;
-        }
-        int totalHeight = 0;
-        for (int i = 0; i < listAdapter.getCount(); i++) {
-            View listItem = listAdapter.getView(i, null, listView);
-            listItem.measure(0, 0);
-            totalHeight += listItem.getMeasuredHeight();
-        }
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        params.height = totalHeight +200;
-        listView.setLayoutParams(params);
     }
 }
