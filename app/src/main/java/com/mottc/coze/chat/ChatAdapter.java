@@ -179,6 +179,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     mActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            sendImageHolder.mSendImage.setImageResource(R.drawable.image);
                             sendImageHolder.mProgressBar.setVisibility(View.GONE);
                             sendImageHolder.mPercentage.setVisibility(View.VISIBLE);
                             sendImageHolder.mPercentage.setText("发送失败");

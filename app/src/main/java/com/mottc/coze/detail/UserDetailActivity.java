@@ -1,9 +1,11 @@
 package com.mottc.coze.detail;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -11,7 +13,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
 import com.mottc.coze.CozeApplication;
 import com.mottc.coze.R;
@@ -52,6 +56,7 @@ public class UserDetailActivity extends AppCompatActivity {
 
     private String username;
     private CozeUserDao mCozeUserDao;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,21 +103,53 @@ public class UserDetailActivity extends AppCompatActivity {
         mCollapsingToolbar.setTitle(username);
         mTvUsername.setText(username);
 
-        AvatarUtils.setAvatar(this,username,mImage);
+        AvatarUtils.setAvatar(this, username, mImage);
     }
-
-
 
 
     @OnClick({R.id.btn_delete_friend, R.id.btn_send_msg, R.id.btn_change_avatar, R.id.btn_add_friend})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_delete_friend:
-//                TODO
-//                Long id = CommonUtils.getCozeUserFromDB(username).getId();
-//                CozeUser cozeUser = new CozeUser(id, username, "zhangsan", null);
-//                CozeApplication.getInstance().getDaoSession(EMClient.getInstance().getCurrentUser())
-//                        .getCozeUserDao().update(cozeUser);
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("确认删除好友？");
+                builder.setTitle("提示");
+                builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(final DialogInterface dialog, int which) {
+                            EMClient.getInstance().contactManager().aysncDeleteContact(username, new EMCallBack() {
+                                @Override
+                                public void onSuccess() {
+                                    dialog.dismiss();
+                                    startActivity(new Intent(UserDetailActivity.this, UserDetailActivity.class)
+                                            .putExtra("username",username));
+                                    finish();
+                                }
+                                @Override
+                                public void onError(int code, String error) {
+
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(UserDetailActivity.this, "删除失败，请重试", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+                                @Override
+                                public void onProgress(int progress, String status) {
+
+                                }
+                            });
+                    }
+                });
+                builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        dialog.dismiss();
+                    }
+                });
+                builder.create().show();
                 break;
             case R.id.btn_send_msg:
                 startActivity(new Intent(this, ChatActivity.class).putExtra("toUsername", username));

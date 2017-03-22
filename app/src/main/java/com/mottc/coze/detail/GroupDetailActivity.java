@@ -1,10 +1,12 @@
 package com.mottc.coze.detail;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,11 +14,14 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMGroup;
 import com.hyphenate.exceptions.HyphenateException;
@@ -104,6 +109,50 @@ public class GroupDetailActivity extends AppCompatActivity {
                 break;
             case R.id.btn_change_group_name:
 
+                final EditText editText = new EditText(this);
+
+                new AlertDialog.Builder(this)
+                        .setTitle("请输入新的群组名称：")
+                        .setView(editText)
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                String newGroupName = editText.getText().toString().trim();
+                                EMClient.getInstance().groupManager().asyncChangeGroupName(group_id, newGroupName, new EMCallBack() {
+                                    @Override
+                                    public void onSuccess() {
+
+                                        startActivity(new Intent(GroupDetailActivity.this, GroupDetailActivity.class)
+                                                .putExtra("group_id", group_id));
+                                        finish();
+                                    }
+
+                                    @Override
+                                    public void onError(int code, String error) {
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                Toast.makeText(GroupDetailActivity.this, "修改名称失败，请重试", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+
+                                    }
+
+                                    @Override
+                                    public void onProgress(int progress, String status) {
+
+                                    }
+                                });
+                            }
+                        })
+                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }).show();
+
+
                 break;
         }
     }
@@ -125,9 +174,9 @@ public class GroupDetailActivity extends AppCompatActivity {
         protected void onPostExecute(String[] result) {
             // Call setRefreshing(false) when the list has been refreshed.
 
+            super.onPostExecute(result);
             List<String> group_members = new ArrayList<>();
             EMGroup group = EMClient.getInstance().groupManager().getGroup(group_id);
-            super.onPostExecute(result);
             mGroupMembers.setVisibility(View.VISIBLE);
             mProgressBar.setVisibility(View.GONE);
             group_members.clear();
