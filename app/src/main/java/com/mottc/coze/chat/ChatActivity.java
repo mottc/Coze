@@ -1,9 +1,15 @@
 package com.mottc.coze.chat;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
+import android.os.PowerManager;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,11 +22,13 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.hyphenate.EMError;
 import com.hyphenate.EMMessageListener;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMConversation;
@@ -75,6 +83,12 @@ public class ChatActivity extends AppCompatActivity {
     TextView mTalkTo;
     @BindView(R.id.btn_detail)
     ImageButton mBtnDetail;
+    @BindView(R.id.voice_image)
+    ImageView mVoiceImage;
+    @BindView(R.id.voice_text)
+    TextView mVoiceText;
+    @BindView(R.id.voice_recorder)
+    LinearLayout mVoiceRecorder;
 
     private String toChatUsername;
     private int chat_type;
@@ -83,8 +97,21 @@ public class ChatActivity extends AppCompatActivity {
     private EMConversation conversation;
     private List<View> hideInputExcludeViews;
     private String fileName;
+    private VoiceRecorder voiceRecorder;
+    protected Drawable[] micImages;
+    protected PowerManager.WakeLock wakeLock;
     private static final int IMAGE_REQUEST_CODE = 0;
     private static final int CAMERA_REQUEST_CODE = 1;
+
+    protected Handler micImageHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            // change image
+            mVoiceImage.setImageDrawable(micImages[msg.what]);
+        }
+    };
+
+
 
 
     @Override
@@ -95,8 +122,16 @@ public class ChatActivity extends AppCompatActivity {
         toChatUsername = this.getIntent().getStringExtra("toUsername");
         chat_type = this.getIntent().getIntExtra("chat_type", Constant.USER);
         messages = new ArrayList<>();
+        voiceRecorder = new VoiceRecorder(micImageHandler);
         hideInputExcludeViews = new ArrayList<>();
         hideInputExcludeViews.add(mSend);
+        micImages=  new Drawable[] {
+                getResources().getDrawable(R.drawable.voice1),
+                getResources().getDrawable(R.drawable.voice2),
+                getResources().getDrawable(R.drawable.voice3),
+              };
+        wakeLock = ((PowerManager) getSystemService(Context.POWER_SERVICE)).newWakeLock(
+                PowerManager.SCREEN_DIM_WAKE_LOCK, "demo");
         initView();
         getMsg();
         mChatAdapter = new ChatAdapter(messages, chat_type, this);
@@ -157,11 +192,133 @@ public class ChatActivity extends AppCompatActivity {
         mVoice.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-
+                onPressToSpeakBtnTouch(v, event, new EaseVoiceRecorderCallback() {
+                    @Override
+                    public void onVoiceRecordComplete(String voiceFilePath, int voiceTimeLength) {
+                        sendVoice(voiceFilePath, voiceTimeLength);
+                    }
+                });
                 return false;
             }
         });
 
+    }
+
+
+    public boolean onPressToSpeakBtnTouch(View v, MotionEvent event, EaseVoiceRecorderCallback recorderCallback) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                try {
+//                    TODO
+                    if (VoicePlayClickListener.isPlaying)
+                        VoicePlayClickListener.currentPlayListener.stopPlayVoice();
+                    v.setPressed(true);
+                    startRecording();
+                } catch (Exception e) {
+                    v.setPressed(false);
+                }
+                return true;
+            case MotionEvent.ACTION_MOVE:
+                if (event.getY() < 0) {
+                    showReleaseToCancelHint();
+                } else {
+                    showMoveUpToCancelHint();
+                }
+                return true;
+            case MotionEvent.ACTION_UP:
+                v.setPressed(false);
+                if (event.getY() < 0) {
+                    // discard the recorded audio.
+                    discardRecording();
+                } else {
+                    // stop recording and send voice file
+                    try {
+                        int length = stopRecoding();
+                        if (length > 0) {
+                            if (recorderCallback != null) {
+                                recorderCallback.onVoiceRecordComplete(getVoiceFilePath(), length);
+                            }
+                        } else if (length == EMError.FILE_INVALID) {
+                            Toast.makeText(this, R.string.Recording_without_permission, Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(this, R.string.The_recording_time_is_too_short, Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Toast.makeText(this, R.string.send_failure_please, Toast.LENGTH_SHORT).show();
+                    }
+                }
+                return true;
+            default:
+                discardRecording();
+                return false;
+        }
+    }
+
+    public interface EaseVoiceRecorderCallback {
+        /**
+         * on voice record complete
+         *
+         * @param voiceFilePath   录音完毕后的文件路径
+         * @param voiceTimeLength 录音时长
+         */
+        void onVoiceRecordComplete(String voiceFilePath, int voiceTimeLength);
+    }
+
+    public void startRecording() {
+        if (!CommonUtils.isSdcardExist()) {
+            Toast.makeText(this, R.string.Send_voice_need_sdcard_support, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        try {
+            wakeLock.acquire();
+            mVoiceRecorder.setVisibility(View.VISIBLE);
+            mVoiceText.setText(R.string.up_to_cancel);
+            voiceRecorder.startRecording(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (wakeLock.isHeld())
+                wakeLock.release();
+            if (voiceRecorder != null)
+                voiceRecorder.discardRecording();
+            mVoiceRecorder.setVisibility(View.INVISIBLE);
+            Toast.makeText(this, R.string.recoding_fail, Toast.LENGTH_SHORT).show();
+            return;
+        }
+    }
+
+    public void showReleaseToCancelHint() {
+        mVoiceText.setText(R.string.release_to_cancel);
+        mVoiceText.setTextColor(getResources().getColor(android.R.color.holo_red_light));
+    }
+
+    public void showMoveUpToCancelHint() {
+        mVoiceText.setText(R.string.up_to_cancel);
+        mVoiceText.setTextColor(Color.BLACK);
+    }
+
+    public void discardRecording() {
+        if (wakeLock.isHeld())
+            wakeLock.release();
+        try {
+            // stop recording
+            if (voiceRecorder.isRecording()) {
+                voiceRecorder.discardRecording();
+                mVoiceRecorder.setVisibility(View.INVISIBLE);
+            }
+        } catch (Exception e) {
+        }
+    }
+
+    public int stopRecoding() {
+        mVoiceRecorder.setVisibility(View.INVISIBLE);
+        if (wakeLock.isHeld())
+            wakeLock.release();
+        return voiceRecorder.stopRecoding();
+    }
+
+    public String getVoiceFilePath() {
+        return voiceRecorder.getVoiceFilePath();
     }
 
     private void getMsg() {
@@ -269,6 +426,19 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
+    private void sendVoice(String filePath, int length) {
+        EMMessage message = EMMessage.createVoiceSendMessage(filePath, length, toChatUsername);
+        //如果是群聊，设置chattype，默认是单聊
+        if (chat_type == Constant.GROUP)
+            message.setChatType(EMMessage.ChatType.GroupChat);
+        EMClient.getInstance().chatManager().sendMessage(message);
+        messages.add(message);
+        mChatAdapter.notifyDataSetChanged();
+        if (messages.size() > 0) {
+            mChatRecyclerView.smoothScrollToPosition(messages.size() - 1);
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // 结果码不等于取消时候
@@ -314,16 +484,14 @@ public class ChatActivity extends AppCompatActivity {
     }
 
 
-    @OnClick({R.id.image, R.id.voice, R.id.camera, R.id.phone, R.id.video, R.id.send, R.id.add, R.id.remove})
+    @OnClick({R.id.image, R.id.camera, R.id.phone, R.id.video, R.id.send, R.id.add, R.id.remove})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.image:
-                Intent imageIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                Intent imageIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(imageIntent, IMAGE_REQUEST_CODE);
                 break;
-            case R.id.voice:
 
-                break;
             case R.id.camera:
 
                 PermissionsUtils.verifyStoragePermissions(this);
@@ -358,8 +526,6 @@ public class ChatActivity extends AppCompatActivity {
                 break;
         }
     }
-
-
 
 
     @Override

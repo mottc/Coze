@@ -164,4 +164,27 @@
 
     </android.support.v7.widget.RecyclerView>
 
+    <LinearLayout
+        android:id="@+id/voice_recorder"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:background="@drawable/voice_bg"
+        android:paddingTop="20dp"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:visibility="gone">
+        <ImageView
+            android:id="@+id/voice_image"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:src="@drawable/voice1"/>
+        <TextView
+            android:id="@+id/voice_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12dp"
+            android:layout_gravity="center"/>
+    </LinearLayout>
+
 </RelativeLayout>

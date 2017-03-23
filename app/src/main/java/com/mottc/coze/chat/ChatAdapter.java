@@ -5,6 +5,7 @@ import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.hyphenate.EMCallBack;
@@ -22,6 +24,7 @@ import com.hyphenate.chat.EMFileMessageBody;
 import com.hyphenate.chat.EMImageMessageBody;
 import com.hyphenate.chat.EMMessage;
 import com.hyphenate.chat.EMTextMessageBody;
+import com.hyphenate.chat.EMVoiceMessageBody;
 import com.hyphenate.util.ImageUtils;
 import com.mottc.coze.Constant;
 import com.mottc.coze.R;
@@ -98,7 +101,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
             case 2:
                 view = inflater.inflate(R.layout.receive_voice, parent, false);
-                return new ReceiveVoice(view);
+                return new ReceiveVoiceHolder(view);
 
             case 3:
                 view = inflater.inflate(R.layout.send_txt, parent, false);
@@ -225,6 +228,37 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     mActivity.startActivity(new Intent(mActivity, ShowImageActivity.class).putExtra("imageUrl",emImageMessageBody.getLocalUrl()));
                 }
             });
+        }
+
+        if (holder instanceof SendVoiceHolder) {
+            SendVoiceHolder sendVoiceHolder = (SendVoiceHolder) holder;
+            EMVoiceMessageBody emVoiceMessageBody = (EMVoiceMessageBody) mValues.get(position).getBody();
+            int length = emVoiceMessageBody.getLength();
+            sendVoiceHolder.mTvLength.setText(String.valueOf(length)+"\"");
+            sendVoiceHolder.mSeekBar.setMax(length);
+            sendVoiceHolder.mBubble.setOnClickListener(new VoicePlayClickListener(mValues.get(position),sendVoiceHolder.mSeekBar,null,this,mActivity));
+        }
+        if (holder instanceof ReceiveVoiceHolder) {
+            ReceiveVoiceHolder receiveVoiceHolder = (ReceiveVoiceHolder) holder;
+            EMVoiceMessageBody emVoiceMessageBody = (EMVoiceMessageBody) mValues.get(position).getBody();
+            int length = emVoiceMessageBody.getLength();
+            receiveVoiceHolder.mTvLength.setText(String.valueOf(length)+"\"");
+            if (mValues.get(position).isListened()) {
+                // hide the unread icon
+                receiveVoiceHolder.mTvLength.setTextColor(Color.WHITE);
+            } else {
+                receiveVoiceHolder.mTvLength.setTextColor(Color.RED);
+            }
+            receiveVoiceHolder.mSeekBar.setMax(length);
+            if (chat_type == Constant.GROUP) {
+                receiveVoiceHolder.mTvUserName.setVisibility(View.VISIBLE);
+                receiveVoiceHolder.mTvUserName.setText(mValues.get(position).getFrom());
+            } else {
+                receiveVoiceHolder.mTvUserName.setVisibility(View.GONE);
+            }
+            AvatarUtils.setAvatar(context, mValues.get(position).getFrom(), receiveVoiceHolder.mIvUserAvatar);
+            receiveVoiceHolder.mRelativeLayout.setOnClickListener(new VoicePlayClickListener(mValues.get(position),receiveVoiceHolder.mSeekBar,receiveVoiceHolder.mTvLength,this,mActivity));
+
         }
 
         if (holder instanceof ReceiveImageHolder) {
@@ -385,12 +419,10 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     static class SendVoiceHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.timestamp)
         TextView mTimestamp;
-        @BindView(R.id.iv_voice)
-        ProgressBar mIvVoice;
+        @BindView(R.id.voice_seekBar)
+        SeekBar mSeekBar;
         @BindView(R.id.tv_length)
         TextView mTvLength;
-        @BindView(R.id.unread_dot)
-        ImageView mUnreadDot;
         @BindView(R.id.bubble)
         RelativeLayout mBubble;
 
@@ -428,21 +460,21 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
-    static class ReceiveVoice extends RecyclerView.ViewHolder {
+    static class ReceiveVoiceHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.timestamp)
         TextView mTimestamp;
         @BindView(R.id.tv_userName)
         TextView mTvUserName;
         @BindView(R.id.iv_userAvatar)
         ImageView mIvUserAvatar;
-        @BindView(R.id.iv_voice)
-        ProgressBar mIvVoice;
+        @BindView(R.id.voice_seekBar)
+        SeekBar mSeekBar;
         @BindView(R.id.tv_length)
         TextView mTvLength;
-        @BindView(R.id.unread_dot)
-        ImageView mUnreadDot;
+        @BindView(R.id.bubble)
+        RelativeLayout mRelativeLayout;
 
-        ReceiveVoice(View view) {
+        ReceiveVoiceHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
         }

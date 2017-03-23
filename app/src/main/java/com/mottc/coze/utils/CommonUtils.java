@@ -97,4 +97,10 @@ public class CommonUtils {
         }
         return uri;
     }
+
+
+    public static boolean isSdcardExist() {
+        return android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED);
+    }
+
 }

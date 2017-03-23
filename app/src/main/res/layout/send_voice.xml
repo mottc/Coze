@@ -26,29 +26,22 @@
         android:background="@drawable/bg_outcoming_message"
         >
 
-        <ProgressBar
-            android:id="@+id/iv_voice"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"/>
+
+        <SeekBar
+            android:id="@+id/voice_seekBar"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:progress="0"/>
 
         <TextView
             android:id="@+id/tv_length"
-            android:layout_width="wrap_content"
+            android:layout_width="26dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/iv_voice"
+            android:layout_toRightOf="@id/voice_seekBar"
             android:layout_marginLeft="5dp"
+            android:textColor="@android:color/white"
             tools:ignore="HardcodedText"/>
 
-        <ImageView
-            android:id="@+id/unread_dot"
-            android:layout_width="5dp"
-            android:layout_height="5dp"
-            android:layout_below="@id/iv_voice"
-            android:layout_marginLeft="5dp"
-            android:layout_toRightOf="@id/tv_length"
-            android:src="@drawable/unread_count_bg"
-            android:visibility="visible"/>
     </RelativeLayout>
 
 

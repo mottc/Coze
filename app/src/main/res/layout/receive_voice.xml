@@ -45,29 +45,31 @@
             android:layout_toRightOf="@id/iv_userAvatar"
             android:layout_alignTop="@id/iv_userAvatar"
             android:background="@drawable/bg_incoming_message"
+            android:gravity="center_vertical"
             >
-
-            <ProgressBar
-                android:id="@+id/iv_voice"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                style="?android:attr/progressBarStyleHorizontal"/>
             <TextView
                 android:id="@+id/tv_length"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/iv_voice"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_marginLeft="5dp"
                 tools:ignore="HardcodedText"/>
-            <ImageView
-                android:id="@+id/unread_dot"
-                android:layout_width="5dp"
-                android:layout_height="5dp"
-                android:layout_below="@id/iv_voice"
-                android:layout_marginLeft="5dp"
+
+            <SeekBar
+                android:id="@+id/voice_seekBar"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/tv_length"
-                android:src="@drawable/unread_count_bg"
-                android:visibility="visible"/>
+                android:progress="0"/>
+
+            <!--<ImageView-->
+                <!--android:id="@+id/unread_dot"-->
+                <!--android:layout_width="5dp"-->
+                <!--android:layout_height="5dp"-->
+                <!--android:layout_below="@id/iv_voice"-->
+                <!--android:layout_marginLeft="5dp"-->
+                <!--android:layout_toRightOf="@id/tv_length"-->
+                <!--android:src="@drawable/unread_count_bg"-->
+                <!--android:visibility="visible"/>-->
         </RelativeLayout>
 
 
