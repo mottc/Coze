@@ -5,12 +5,14 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -232,10 +234,31 @@ public class MainActivity extends AppCompatActivity
         if (mDrawerLayout.isMenuVisible()) {
             mDrawerLayout.closeMenu();
         } else {
-            super.onBackPressed();
+            showTips();
         }
     }
 
+    private void showTips() {
+
+        AlertDialog alertDialog = new AlertDialog
+                .Builder(this)
+                .setTitle("提醒")
+                .setMessage("是否退出程序")
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                })
+                .setNegativeButton("取消",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                return;
+                            }
+                        })
+                .create(); // 创建对话框
+
+        alertDialog.show(); // 显示对话框
+    }
 
     @Override
     public void onContactItemClick(CozeUser item, View view) {

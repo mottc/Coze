@@ -62,6 +62,7 @@ public class UploadAvatarActivity extends AppCompatActivity {
     private UploadManager mUploadManager;
     private String username;
     private String password;
+    private Boolean isRegister;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,11 +73,27 @@ public class UploadAvatarActivity extends AppCompatActivity {
         mUploadManager = new UploadManager();
         username = this.getIntent().getStringExtra("username");
         password = this.getIntent().getStringExtra("loginPassword");
+        isRegister = this.getIntent().getBooleanExtra("isRegister", false);
+        setupAvatar();
+
+    }
+
+    private void setupAvatar() {
+        if (!isRegister) {
+            AvatarUtils.setAvatar(this, username, mUploadAvatar);
+        }
     }
 
     private void setupToolbar() {
         mUploadAvatarToolbar.setTitle("设置头像");
         setSupportActionBar(mUploadAvatarToolbar);
+        mUploadAvatarToolbar.setNavigationIcon(R.drawable.back);
+        mUploadAvatarToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     @Override
@@ -144,41 +161,53 @@ public class UploadAvatarActivity extends AppCompatActivity {
         mUploadManager.put(data, upkey, token, new UpCompletionHandler() {
             public void complete(String key, ResponseInfo rinfo, JSONObject response) {
 
-                EMClient.getInstance().login(username, password, new EMCallBack() {
 
+                runOnUiThread(new Runnable() {
                     @Override
-                    public void onSuccess() {
-                        // 第一次登录或者之前logout后再登录，加载所有本地群和回话
-                        try {
-                            EMClient.getInstance().groupManager().getJoinedGroupsFromServer();
-                        } catch (HyphenateException e) {
-                            e.printStackTrace();
-                        }
-                        EMClient.getInstance().groupManager().loadAllGroups();
-                        EMClient.getInstance().chatManager().loadAllConversations();
-                        getFriends();
-
-                        // 进入主页面
-                        Intent intent = new Intent(UploadAvatarActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
-
-                    @Override
-                    public void onProgress(int progress, String status) {
-                    }
-
-                    @Override
-                    public void onError(final int code, final String message) {
-
-                        runOnUiThread(new Runnable() {
-                            public void run() {
-                                Toast.makeText(getApplicationContext(), getString(R.string.login_failed) + message,
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                    public void run() {
+                        Toast.makeText(UploadAvatarActivity.this, "上传成功", Toast.LENGTH_SHORT).show();
                     }
                 });
+                if (isRegister) {
+                    EMClient.getInstance().login(username, password, new EMCallBack() {
+
+                        @Override
+                        public void onSuccess() {
+                            // 第一次登录或者之前logout后再登录，加载所有本地群和回话
+                            try {
+                                EMClient.getInstance().groupManager().getJoinedGroupsFromServer();
+                            } catch (HyphenateException e) {
+                                e.printStackTrace();
+                            }
+                            EMClient.getInstance().groupManager().loadAllGroups();
+                            EMClient.getInstance().chatManager().loadAllConversations();
+                            getFriends();
+
+                            // 进入主页面
+                            Intent intent = new Intent(UploadAvatarActivity.this, MainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+
+                        @Override
+                        public void onProgress(int progress, String status) {
+                        }
+
+                        @Override
+                        public void onError(final int code, final String message) {
+
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    Toast.makeText(getApplicationContext(), getString(R.string.login_failed) + message,
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    finish();
+                }
+
             }
         }, null);
 

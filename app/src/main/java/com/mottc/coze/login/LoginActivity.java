@@ -178,6 +178,14 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 registerUser.setError("");
 
+                for(int i=0;i<RegisterUserName.length();i++) {
+                    char c = RegisterUserName.charAt(i);
+                    if (Character.isUpperCase(c)) {
+                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.illegal_user_name), Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                }
+
                 RegisterPassword = registerPass.getEditText().getText().toString();
                 if (RegisterPassword.isEmpty()) {
                     registerPass.setError("Password can't be empty");
@@ -210,7 +218,7 @@ public class LoginActivity extends AppCompatActivity {
                                         CozeApplication.getInstance().setCurrentUserName(RegisterUserName);
                                         Toast.makeText(getApplicationContext(), getResources().getString(R.string.registered_successfully), Toast.LENGTH_LONG).show();
                                         startActivity(new Intent(LoginActivity.this, UploadAvatarActivity.class).putExtra("username",RegisterUserName)
-                                        .putExtra("loginPassword",RegisterPassword));
+                                        .putExtra("loginPassword",RegisterPassword).putExtra("isRegister",true));
                                         finish();
                                     }
                                 });

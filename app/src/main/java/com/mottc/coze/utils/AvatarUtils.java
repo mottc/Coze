@@ -26,6 +26,16 @@ public class AvatarUtils {
                 .into(imageView);
     }
 
+    public static void setAvatarWithoutCache(Context context, String username, ImageView imageView) {
+
+        String Url = Constant.BASIC_URL + username + ".png?" + System.currentTimeMillis();
+        Glide
+                .with(context)
+                .load(Url)
+                .error(R.drawable.default_avatar)
+                .into(imageView);
+    }
+
 
     public static String createImageToken(String userName) {
         String bucketName = "jungle:" + userName + ".png";

@@ -51,6 +51,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private int chat_type;
     private Context context;
     private Activity mActivity;
+    int voiceProgress = 0;
 
     public ChatAdapter(List<EMMessage> values, int chat_type, Context context) {
         mValues = values;
@@ -231,15 +232,37 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         if (holder instanceof SendVoiceHolder) {
-            SendVoiceHolder sendVoiceHolder = (SendVoiceHolder) holder;
+            final SendVoiceHolder sendVoiceHolder = (SendVoiceHolder) holder;
             EMVoiceMessageBody emVoiceMessageBody = (EMVoiceMessageBody) mValues.get(position).getBody();
             int length = emVoiceMessageBody.getLength();
+
             sendVoiceHolder.mTvLength.setText(String.valueOf(length)+"\"");
             sendVoiceHolder.mSeekBar.setMax(length);
-            sendVoiceHolder.mBubble.setOnClickListener(new VoicePlayClickListener(mValues.get(position),sendVoiceHolder.mSeekBar,null,this,mActivity));
+            sendVoiceHolder.mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    if (fromUser) {
+                        voiceProgress = progress;
+                    }
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    sendVoiceHolder.mVoiceStatus.setOnClickListener(new VoicePlayClickListener(mValues.get(position),sendVoiceHolder.mSeekBar,null,null,mActivity,sendVoiceHolder.mVoiceStatus,voiceProgress));
+
+                }
+            });
+            sendVoiceHolder.mVoiceStatus.setOnClickListener(new VoicePlayClickListener(mValues.get(position),sendVoiceHolder.mSeekBar,null,null,mActivity,sendVoiceHolder.mVoiceStatus,0));
+
         }
         if (holder instanceof ReceiveVoiceHolder) {
-            ReceiveVoiceHolder receiveVoiceHolder = (ReceiveVoiceHolder) holder;
+            final ReceiveVoiceHolder receiveVoiceHolder = (ReceiveVoiceHolder) holder;
             EMVoiceMessageBody emVoiceMessageBody = (EMVoiceMessageBody) mValues.get(position).getBody();
             int length = emVoiceMessageBody.getLength();
             receiveVoiceHolder.mTvLength.setText(String.valueOf(length)+"\"");
@@ -257,7 +280,35 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 receiveVoiceHolder.mTvUserName.setVisibility(View.GONE);
             }
             AvatarUtils.setAvatar(context, mValues.get(position).getFrom(), receiveVoiceHolder.mIvUserAvatar);
-            receiveVoiceHolder.mRelativeLayout.setOnClickListener(new VoicePlayClickListener(mValues.get(position),receiveVoiceHolder.mSeekBar,receiveVoiceHolder.mTvLength,this,mActivity));
+            receiveVoiceHolder.mIvUserAvatar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation((Activity) context, receiveVoiceHolder.mIvUserAvatar, "TransImage");
+                    Intent intent = new Intent(context, UserDetailActivity.class);
+                    intent.putExtra("username", mValues.get(position).getFrom());
+                    context.startActivity(intent, options.toBundle());
+                }
+            });
+            receiveVoiceHolder.mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    voiceProgress = progress;
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    receiveVoiceHolder.mVoiceStatus.setOnClickListener(new VoicePlayClickListener(mValues.get(position),receiveVoiceHolder.mSeekBar,receiveVoiceHolder.mTvLength,null,mActivity,receiveVoiceHolder.mVoiceStatus,voiceProgress));
+
+                }
+            });
+
+            receiveVoiceHolder.mVoiceStatus.setOnClickListener(new VoicePlayClickListener(mValues.get(position),receiveVoiceHolder.mSeekBar,receiveVoiceHolder.mTvLength,this,mActivity,receiveVoiceHolder.mVoiceStatus,0));
 
         }
 
@@ -425,8 +476,10 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         TextView mTvLength;
         @BindView(R.id.bubble)
         RelativeLayout mBubble;
-
+        @BindView(R.id.voice_status)
+        ImageView mVoiceStatus;
         SendVoiceHolder(View view) {
+
             super(view);
             ButterKnife.bind(this, view);
         }
@@ -473,6 +526,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         TextView mTvLength;
         @BindView(R.id.bubble)
         RelativeLayout mRelativeLayout;
+        @BindView(R.id.voice_status)
+        ImageView mVoiceStatus;
 
         ReceiveVoiceHolder(View view) {
             super(view);
@@ -515,4 +570,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             ButterKnife.bind(this, view);
         }
     }
+
+
 }

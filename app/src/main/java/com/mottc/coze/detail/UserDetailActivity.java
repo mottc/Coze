@@ -20,6 +20,7 @@ import com.hyphenate.chat.EMClient;
 import com.mottc.coze.CozeApplication;
 import com.mottc.coze.R;
 import com.mottc.coze.add.AddNewFriendActivity;
+import com.mottc.coze.avatar.UploadAvatarActivity;
 import com.mottc.coze.bean.CozeUser;
 import com.mottc.coze.chat.ChatActivity;
 import com.mottc.coze.db.CozeUserDao;
@@ -103,7 +104,8 @@ public class UserDetailActivity extends AppCompatActivity {
         mCollapsingToolbar.setTitle(username);
         mTvUsername.setText(username);
 
-        AvatarUtils.setAvatar(this, username, mImage);
+//        AvatarUtils.setAvatar(this, username, mImage);
+        AvatarUtils.setAvatarWithoutCache(this, username, mImage);
     }
 
 
@@ -156,6 +158,7 @@ public class UserDetailActivity extends AppCompatActivity {
                 finish();
                 break;
             case R.id.btn_change_avatar:
+                startActivity(new Intent(this, UploadAvatarActivity.class).putExtra("username",username).putExtra("isRegister", false));
                 break;
             case R.id.btn_add_friend:
                 startActivity(new Intent(this, AddNewFriendActivity.class).putExtra("new_name", username));

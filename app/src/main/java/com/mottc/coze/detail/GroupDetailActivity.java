@@ -26,6 +26,7 @@ import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMGroup;
 import com.hyphenate.exceptions.HyphenateException;
 import com.mottc.coze.R;
+import com.mottc.coze.avatar.UploadAvatarActivity;
 import com.mottc.coze.utils.AvatarUtils;
 
 import java.util.ArrayList;
@@ -88,7 +89,8 @@ public class GroupDetailActivity extends AppCompatActivity {
             }
         });
 
-        AvatarUtils.setAvatar(this, group_id, mImage);
+//        AvatarUtils.setAvatar(this, group_id, mImage);
+        AvatarUtils.setAvatarWithoutCache(this, group_id, mImage);
 
         mCollapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         mCollapsingToolbar.setCollapsedTitleTextColor(Color.WHITE);
@@ -98,14 +100,13 @@ public class GroupDetailActivity extends AppCompatActivity {
         mGroupMembers.setNestedScrollingEnabled(false);
         mGroupMembers.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
-
     }
 
     @OnClick({R.id.btn_change_group_avatar, R.id.btn_change_group_name})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_change_group_avatar:
-
+                startActivity(new Intent(this, UploadAvatarActivity.class).putExtra("username", group_id).putExtra("isRegister", false));
                 break;
             case R.id.btn_change_group_name:
 

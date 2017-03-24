@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,6 +40,8 @@ public class VoicePlayClickListener implements View.OnClickListener {
     private ChatAdapter adapter;
     private Boolean isStop;
     private TextView mTextView;
+    private int voiceProgress;
+    private ImageView mVoiceStatus;
 
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
@@ -52,7 +55,7 @@ public class VoicePlayClickListener implements View.OnClickListener {
     public static VoicePlayClickListener currentPlayListener = null;
     public static String playMsgId;
 
-    public VoicePlayClickListener(EMMessage message, SeekBar seekBar,TextView textView, ChatAdapter adapter, Activity context) {
+    public VoicePlayClickListener(EMMessage message, SeekBar seekBar, TextView textView, ChatAdapter adapter, Activity context, ImageView mVoiceStatus,int voiceProgress) {
         this.message = message;
         voiceBody = (EMVoiceMessageBody) message.getBody();
         this.adapter = adapter;
@@ -60,6 +63,8 @@ public class VoicePlayClickListener implements View.OnClickListener {
         mTextView = textView;
         this.activity = context;
         this.chatType = message.getChatType();
+        this.voiceProgress = voiceProgress;
+        this.mVoiceStatus = mVoiceStatus;
     }
 
     public void stopPlayVoice() {
@@ -71,6 +76,7 @@ public class VoicePlayClickListener implements View.OnClickListener {
         isPlaying = false;
         isStop = true;
         playMsgId = null;
+        mVoiceStatus.setImageResource(R.drawable.play);
         mSeekBar.setProgress(0);
 //        adapter.notifyDataSetChanged();
     }
@@ -98,16 +104,19 @@ public class VoicePlayClickListener implements View.OnClickListener {
         try {
             mediaPlayer.setDataSource(filePath);
             mediaPlayer.prepare();
+            mediaPlayer.seekTo(voiceProgress*1000);
             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
                     // TODO Auto-generated method stub
                     mediaPlayer.release();
                     mediaPlayer = null;
+                    voiceProgress = 0;
                     stopPlayVoice(); // stop animation
                 }
 
             });
+            mVoiceStatus.setImageResource(R.drawable.stop);
             isPlaying = true;
             isStop = false;
             currentPlayListener = this;
@@ -143,9 +152,14 @@ public class VoicePlayClickListener implements View.OnClickListener {
                     if (isStop) {
                         break;
                     }
-                    Message handleMessage = new Message();
-                    handleMessage.what = (mediaPlayer.getCurrentPosition()+500)/1000;
-                    handler.sendMessage(handleMessage);
+                    try {
+                        Message handleMessage = new Message();
+                        handleMessage.what = (mediaPlayer.getCurrentPosition()+300) / 1000;
+                        handler.sendMessage(handleMessage);
+                    } catch (IllegalStateException e) {
+                        e.printStackTrace();
+                    }
+
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {

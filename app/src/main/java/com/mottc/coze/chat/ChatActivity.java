@@ -360,7 +360,7 @@ public class ChatActivity extends AppCompatActivity {
                         // 如果是当前会话的消息，刷新聊天页面
                         if (finalUsername.equals(toChatUsername)) {
                             messages.add(message);
-                            mChatAdapter.notifyDataSetChanged();
+                            mChatAdapter.notifyItemInserted(messages.size() - 1);
                             if (messages.size() > 0) {
                                 mChatRecyclerView.smoothScrollToPosition(messages.size() - 1);
                             }
@@ -405,7 +405,7 @@ public class ChatActivity extends AppCompatActivity {
 
         EMClient.getInstance().chatManager().sendMessage(message);
         messages.add(message);
-        mChatAdapter.notifyDataSetChanged();
+        mChatAdapter.notifyItemInserted(messages.size()-1);
         if (messages.size() > 0) {
             mChatRecyclerView.smoothScrollToPosition(messages.size() - 1);
         }
@@ -420,7 +420,7 @@ public class ChatActivity extends AppCompatActivity {
             message.setChatType(EMMessage.ChatType.GroupChat);
         EMClient.getInstance().chatManager().sendMessage(message);
         messages.add(message);
-        mChatAdapter.notifyDataSetChanged();
+        mChatAdapter.notifyItemInserted(messages.size()-1);
         if (messages.size() > 0) {
             mChatRecyclerView.smoothScrollToPosition(messages.size() - 1);
         }
@@ -433,7 +433,7 @@ public class ChatActivity extends AppCompatActivity {
             message.setChatType(EMMessage.ChatType.GroupChat);
         EMClient.getInstance().chatManager().sendMessage(message);
         messages.add(message);
-        mChatAdapter.notifyDataSetChanged();
+        mChatAdapter.notifyItemInserted(messages.size()-1);
         if (messages.size() > 0) {
             mChatRecyclerView.smoothScrollToPosition(messages.size() - 1);
         }
