@@ -213,6 +213,7 @@ public class UploadAvatarActivity extends AppCompatActivity {
 //                    TODO:监听通知太快，头像未及时更新。
                     mPicFromCamera.setClickable(true);
                     mPicFromImage.setClickable(true);
+                    mUploading.setVisibility(View.INVISIBLE);
                     mOnAvatarChangeListener.onAvatarChange();
                 }
 
