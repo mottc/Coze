@@ -44,7 +44,7 @@ public class GroupRecyclerViewAdapter extends RecyclerView.Adapter<GroupRecycler
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
         holder.mUserName.setText(mValues.get(position).getGroupName());
-        AvatarUtils.setAvatar(context, mValues.get(position).getGroupId(), holder.mAvatar);
+        AvatarUtils.groupSetAvatar(context, mValues.get(position).getGroupId(), holder.mAvatar);
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

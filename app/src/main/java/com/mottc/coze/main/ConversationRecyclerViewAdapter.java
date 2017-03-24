@@ -52,12 +52,15 @@ public class ConversationRecyclerViewAdapter extends RecyclerView.Adapter<Conver
         holder.mItem = mValues.get(position);
         String conversationId = mValues.get(position).conversationId();
         if (mValues.get(position).isGroup()) {
+            AvatarUtils.groupSetAvatar(context, conversationId, holder.mAvatar);
             String groupName = EMClient.getInstance().groupManager().getGroup(conversationId).getGroupName();
             holder.mUsername.setText(groupName);
             holder.mIsGroup.setVisibility(View.VISIBLE);
             String userName = mValues.get(position).getLastMessage().getFrom() + ":";
             setContent(holder, position, userName);
         } else {
+            AvatarUtils.setAvatar(context, conversationId, holder.mAvatar);
+
 //            TODO:
 //            String nickname = CommonUtils.getNickName(conversationId);
             holder.mUsername.setText(conversationId);
@@ -65,7 +68,6 @@ public class ConversationRecyclerViewAdapter extends RecyclerView.Adapter<Conver
             setContent(holder, position, "");
         }
 
-        AvatarUtils.setAvatar(context, conversationId, holder.mAvatar);
 
         holder.mTime.setText(DateUtils.getTimestampString(new Date(mValues.get(position).getLastMessage().getMsgTime())));
         int unread = mValues.get(position).getUnreadMsgCount();

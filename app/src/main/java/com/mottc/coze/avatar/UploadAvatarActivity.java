@@ -25,6 +25,7 @@ import com.mottc.coze.bean.CozeUser;
 import com.mottc.coze.db.CozeUserDao;
 import com.mottc.coze.db.DaoSession;
 import com.mottc.coze.main.MainActivity;
+import com.mottc.coze.main.MenuListFragment;
 import com.mottc.coze.utils.AvatarUtils;
 import com.mottc.coze.utils.CommonUtils;
 import com.mottc.coze.utils.PermissionsUtils;
@@ -64,6 +65,9 @@ public class UploadAvatarActivity extends AppCompatActivity {
     private String password;
     private Boolean isRegister;
 
+//    TODO
+    private OnAvatarChangeListener mOnAvatarChangeListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,12 +79,14 @@ public class UploadAvatarActivity extends AppCompatActivity {
         password = this.getIntent().getStringExtra("loginPassword");
         isRegister = this.getIntent().getBooleanExtra("isRegister", false);
         setupAvatar();
+//TODO
+        mOnAvatarChangeListener = MenuListFragment.getInstance();
 
     }
 
     private void setupAvatar() {
         if (!isRegister) {
-            AvatarUtils.setAvatar(this, username, mUploadAvatar);
+            AvatarUtils.setAvatarWithoutCache(this, username, mUploadAvatar);
         }
     }
 
@@ -161,7 +167,6 @@ public class UploadAvatarActivity extends AppCompatActivity {
         mUploadManager.put(data, upkey, token, new UpCompletionHandler() {
             public void complete(String key, ResponseInfo rinfo, JSONObject response) {
 
-
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -205,13 +210,17 @@ public class UploadAvatarActivity extends AppCompatActivity {
                         }
                     });
                 } else {
-                    finish();
+//                    TODO:监听通知太快，头像未及时更新。
+                    mPicFromCamera.setClickable(true);
+                    mPicFromImage.setClickable(true);
+                    mOnAvatarChangeListener.onAvatarChange();
                 }
 
             }
         }, null);
 
     }
+
 
 
     @OnClick({R.id.pic_from_image, R.id.pic_from_camera})
@@ -237,8 +246,6 @@ public class UploadAvatarActivity extends AppCompatActivity {
     }
 
 
-
-
     private void getFriends() {
 
         DaoSession daoSession = CozeApplication.getInstance().getDaoSession(username);
@@ -256,5 +263,9 @@ public class UploadAvatarActivity extends AppCompatActivity {
         } catch (HyphenateException e) {
             e.printStackTrace();
         }
+    }
+//TODO
+    public interface OnAvatarChangeListener {
+        void onAvatarChange();
     }
 }

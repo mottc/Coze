@@ -2,7 +2,6 @@ package com.mottc.coze.main;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
@@ -11,10 +10,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.hyphenate.EMValueCallBack;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMGroup;
-import com.hyphenate.exceptions.HyphenateException;
 import com.mottc.coze.R;
 
 import java.util.ArrayList;
@@ -64,8 +64,35 @@ public class GroupFragment extends Fragment {
         mWaveSwipeRefreshLayout.setOnRefreshListener(new WaveSwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                // Do work to refresh the list here.
-                new GroupRefreshTask().execute();
+                groupList.clear();
+                EMClient.getInstance().groupManager().asyncGetJoinedGroupsFromServer(new EMValueCallBack<List<EMGroup>>() {
+                    @Override
+                    public void onSuccess(List<EMGroup> value) {
+                        groupList.addAll(value);
+
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mGroupRecyclerViewAdapter.notifyDataSetChanged();
+                                mWaveSwipeRefreshLayout.setRefreshing(false);
+                            }
+                        });
+
+                    }
+                    @Override
+                    public void onError(int error, String errorMsg) {
+
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getActivity(), "请重试", Toast.LENGTH_SHORT).show();
+                                mWaveSwipeRefreshLayout.setRefreshing(false);
+
+                            }
+                        });
+                    }
+                });
+
             }
         });
 
@@ -105,35 +132,6 @@ public class GroupFragment extends Fragment {
         groupList.clear();
         groupList.addAll(EMClient.getInstance().groupManager().getAllGroups());
     }
-
-    private class GroupRefreshTask extends AsyncTask<Void, Void, String[]> {
-
-        List<EMGroup> groupListFromServer = new ArrayList<>();
-        @Override
-        protected String[] doInBackground(Void... params) {
-
-            groupList.clear();
-
-            try {
-                groupListFromServer = EMClient.getInstance().groupManager().getJoinedGroupsFromServer();//需异步处理
-            } catch (HyphenateException e) {
-                e.printStackTrace();
-            }
-
-            return new String[0];
-        }
-
-        @Override
-        protected void onPostExecute(String[] result) {
-            // Call setRefreshing(false) when the list has been refreshed.
-
-            super.onPostExecute(result);
-            groupList.addAll(groupListFromServer);
-            mGroupRecyclerViewAdapter.notifyDataSetChanged();
-            mWaveSwipeRefreshLayout.setRefreshing(false);
-        }
-    }
-
 
     public interface OnGroupItemListener {
         void onGroupItemClick(EMGroup item,View view);

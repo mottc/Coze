@@ -88,6 +88,8 @@ public class UserDetailActivity extends AppCompatActivity {
                 if (user.getUserName().equals(username)) {
                     isStranger = false;
                     mFriendLayout.setVisibility(View.VISIBLE);
+                    String currentAvatar = String.valueOf(System.currentTimeMillis());
+                    mCozeUserDao.update(new CozeUser(user.getId(),user.getUserName(),user.getNickName(), currentAvatar));
                     break;
                 }
             }
@@ -106,6 +108,7 @@ public class UserDetailActivity extends AppCompatActivity {
 
 //        AvatarUtils.setAvatar(this, username, mImage);
         AvatarUtils.setAvatarWithoutCache(this, username, mImage);
+
     }
 
 
@@ -159,6 +162,7 @@ public class UserDetailActivity extends AppCompatActivity {
                 break;
             case R.id.btn_change_avatar:
                 startActivity(new Intent(this, UploadAvatarActivity.class).putExtra("username",username).putExtra("isRegister", false));
+                finish();
                 break;
             case R.id.btn_add_friend:
                 startActivity(new Intent(this, AddNewFriendActivity.class).putExtra("new_name", username));

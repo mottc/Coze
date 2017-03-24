@@ -90,7 +90,7 @@ public class GroupDetailActivity extends AppCompatActivity {
         });
 
 //        AvatarUtils.setAvatar(this, group_id, mImage);
-        AvatarUtils.setAvatarWithoutCache(this, group_id, mImage);
+        AvatarUtils.groupSetAvatar(this, group_id, mImage);
 
         mCollapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         mCollapsingToolbar.setCollapsedTitleTextColor(Color.WHITE);
@@ -111,7 +111,6 @@ public class GroupDetailActivity extends AppCompatActivity {
             case R.id.btn_change_group_name:
 
                 final EditText editText = new EditText(this);
-
                 new AlertDialog.Builder(this)
                         .setTitle("请输入新的群组名称：")
                         .setView(editText)

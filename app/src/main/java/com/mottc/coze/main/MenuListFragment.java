@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
@@ -28,6 +29,7 @@ import com.mottc.coze.R;
 import com.mottc.coze.add.AddGroupActivity;
 import com.mottc.coze.add.AddNewFriendActivity;
 import com.mottc.coze.add.CreateGroupActivity;
+import com.mottc.coze.avatar.UploadAvatarActivity;
 import com.mottc.coze.detail.UserDetailActivity;
 import com.mottc.coze.login.LoginActivity;
 import com.mottc.coze.message.MessageActivity;
@@ -35,11 +37,21 @@ import com.mottc.coze.message.MessageActivity;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MenuListFragment extends Fragment {
+public class MenuListFragment extends Fragment implements UploadAvatarActivity.OnAvatarChangeListener {
 
 
     ImageView user_photo;
     TextView user_name;
+    String currentUsername = EMClient.getInstance().getCurrentUser();
+
+
+    private static class SingletonInstance {
+        private static final MenuListFragment INSTANCE = new MenuListFragment();
+    }
+
+    public static MenuListFragment getInstance() {
+        return SingletonInstance.INSTANCE;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -116,13 +128,18 @@ public class MenuListFragment extends Fragment {
 
     private void setupHeader() {
 
+        loadAvatar(currentUsername);
+        user_name.setText(currentUsername);
+    }
 
-        String currentUsername = EMClient.getInstance().getCurrentUser();
+    private void loadAvatar(String currentUsername) {
         Glide
                 .with(getActivity())
-                .load(Constant.BASIC_URL + currentUsername + ".png")
+                .load(Constant.BASIC_URL + currentUsername + ".png?" + System.currentTimeMillis())
                 .asBitmap()
                 .error(R.drawable.default_avatar)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
                 .centerCrop()
                 .into(new BitmapImageViewTarget(user_photo) {
                     @Override
@@ -133,9 +150,13 @@ public class MenuListFragment extends Fragment {
                         user_photo.setImageDrawable(circularBitmapDrawable);
                     }
                 });
-
-        user_name.setText(currentUsername);
     }
 
+
+    //    TODO
+    @Override
+    public void onAvatarChange() {
+        loadAvatar(currentUsername);
+    }
 
 }

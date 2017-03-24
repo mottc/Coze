@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity
         FragmentManager fm = getSupportFragmentManager();
         MenuListFragment mMenuFragment = (MenuListFragment) fm.findFragmentById(R.id.id_container_menu);
         if (mMenuFragment == null) {
-            mMenuFragment = new MenuListFragment();
+            mMenuFragment = MenuListFragment.getInstance();
             fm.beginTransaction().add(R.id.id_container_menu, mMenuFragment).commit();
         }
     }
