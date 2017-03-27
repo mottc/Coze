@@ -88,8 +88,8 @@
 
         <ImageButton
             android:id="@+id/remove"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:background="#0000"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="10dp"
@@ -103,49 +103,31 @@
             android:background="#0000"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="2dp"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="30dp"
             android:layout_marginRight="10dp"
             android:src="@drawable/image"/>
-        <ImageButton
-            android:id="@+id/voice"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
-            android:layout_marginTop="2dp"
-            android:layout_marginBottom="2dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:background="#0000"
-            android:src="@drawable/voice"/>
+
         <ImageButton
             android:id="@+id/camera"
             android:layout_width="38dp"
             android:layout_height="38dp"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="2dp"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="30dp"
             android:layout_marginRight="10dp"
             android:background="#0000"
             android:src="@drawable/camera"/>
         <ImageButton
-            android:id="@+id/phone"
+            android:id="@+id/voice"
             android:layout_width="38dp"
             android:layout_height="38dp"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="2dp"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="30dp"
             android:layout_marginRight="10dp"
             android:background="#0000"
-            android:src="@drawable/phone"/>
-        <ImageButton
-            android:id="@+id/video"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
-            android:layout_marginTop="2dp"
-            android:layout_marginBottom="2dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:background="#0000"
-            android:src="@drawable/video"/>
+            android:src="@drawable/voice"/>
+
 
     </LinearLayout>
 

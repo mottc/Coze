@@ -1,16 +1,20 @@
 package com.mottc.coze.chat;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -49,6 +53,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.mottc.coze.utils.PermissionsUtils.REQUEST_CODE_ASK_RECORD_AUDIO;
+
 public class ChatActivity extends AppCompatActivity {
 
     @BindView(R.id.chat_toolbar)
@@ -59,10 +65,6 @@ public class ChatActivity extends AppCompatActivity {
     ImageButton mVoice;
     @BindView(R.id.camera)
     ImageButton mCamera;
-    @BindView(R.id.phone)
-    ImageButton mPhone;
-    @BindView(R.id.video)
-    ImageButton mVideo;
     @BindView(R.id.add_choose)
     LinearLayout mAddChoose;
     @BindView(R.id.send)
@@ -102,6 +104,8 @@ public class ChatActivity extends AppCompatActivity {
     protected PowerManager.WakeLock wakeLock;
     private static final int IMAGE_REQUEST_CODE = 0;
     private static final int CAMERA_REQUEST_CODE = 1;
+    final public static int REQUEST_CODE_ASK_CAMERA = 123;
+
 
     protected Handler micImageHandler = new Handler() {
         @Override
@@ -110,8 +114,6 @@ public class ChatActivity extends AppCompatActivity {
             mVoiceImage.setImageDrawable(micImages[msg.what]);
         }
     };
-
-
 
 
     @Override
@@ -125,11 +127,11 @@ public class ChatActivity extends AppCompatActivity {
         voiceRecorder = new VoiceRecorder(micImageHandler);
         hideInputExcludeViews = new ArrayList<>();
         hideInputExcludeViews.add(mSend);
-        micImages=  new Drawable[] {
+        micImages = new Drawable[]{
                 getResources().getDrawable(R.drawable.voice1),
                 getResources().getDrawable(R.drawable.voice2),
                 getResources().getDrawable(R.drawable.voice3),
-              };
+        };
         wakeLock = ((PowerManager) getSystemService(Context.POWER_SERVICE)).newWakeLock(
                 PowerManager.SCREEN_DIM_WAKE_LOCK, "demo");
         initView();
@@ -192,12 +194,14 @@ public class ChatActivity extends AppCompatActivity {
         mVoice.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+
                 onPressToSpeakBtnTouch(v, event, new EaseVoiceRecorderCallback() {
                     @Override
                     public void onVoiceRecordComplete(String voiceFilePath, int voiceTimeLength) {
                         sendVoice(voiceFilePath, voiceTimeLength);
                     }
                 });
+
                 return false;
             }
         });
@@ -208,6 +212,7 @@ public class ChatActivity extends AppCompatActivity {
     public boolean onPressToSpeakBtnTouch(View v, MotionEvent event, EaseVoiceRecorderCallback recorderCallback) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+
                 try {
 //                    TODO
                     if (VoicePlayClickListener.isPlaying)
@@ -218,6 +223,7 @@ public class ChatActivity extends AppCompatActivity {
                     v.setPressed(false);
                 }
                 return true;
+
             case MotionEvent.ACTION_MOVE:
                 if (event.getY() < 0) {
                     showReleaseToCancelHint();
@@ -245,7 +251,6 @@ public class ChatActivity extends AppCompatActivity {
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
-                        Toast.makeText(this, R.string.send_failure_please, Toast.LENGTH_SHORT).show();
                     }
                 }
                 return true;
@@ -266,11 +271,15 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     public void startRecording() {
+
+
         if (!CommonUtils.isSdcardExist()) {
             Toast.makeText(this, R.string.Send_voice_need_sdcard_support, Toast.LENGTH_SHORT).show();
             return;
         }
         try {
+            PermissionsUtils.getRecordPermissions(this);
+
             wakeLock.acquire();
             mVoiceRecorder.setVisibility(View.VISIBLE);
             mVoiceText.setText(R.string.up_to_cancel);
@@ -294,7 +303,7 @@ public class ChatActivity extends AppCompatActivity {
 
     public void showMoveUpToCancelHint() {
         mVoiceText.setText(R.string.up_to_cancel);
-        mVoiceText.setTextColor(Color.BLACK);
+        mVoiceText.setTextColor(getResources().getColor(android.R.color.black));
     }
 
     public void discardRecording() {
@@ -405,7 +414,7 @@ public class ChatActivity extends AppCompatActivity {
 
         EMClient.getInstance().chatManager().sendMessage(message);
         messages.add(message);
-        mChatAdapter.notifyItemInserted(messages.size()-1);
+        mChatAdapter.notifyItemInserted(messages.size() - 1);
         if (messages.size() > 0) {
             mChatRecyclerView.smoothScrollToPosition(messages.size() - 1);
         }
@@ -420,7 +429,7 @@ public class ChatActivity extends AppCompatActivity {
             message.setChatType(EMMessage.ChatType.GroupChat);
         EMClient.getInstance().chatManager().sendMessage(message);
         messages.add(message);
-        mChatAdapter.notifyItemInserted(messages.size()-1);
+        mChatAdapter.notifyItemInserted(messages.size() - 1);
         if (messages.size() > 0) {
             mChatRecyclerView.smoothScrollToPosition(messages.size() - 1);
         }
@@ -433,7 +442,7 @@ public class ChatActivity extends AppCompatActivity {
             message.setChatType(EMMessage.ChatType.GroupChat);
         EMClient.getInstance().chatManager().sendMessage(message);
         messages.add(message);
-        mChatAdapter.notifyItemInserted(messages.size()-1);
+        mChatAdapter.notifyItemInserted(messages.size() - 1);
         if (messages.size() > 0) {
             mChatRecyclerView.smoothScrollToPosition(messages.size() - 1);
         }
@@ -484,31 +493,57 @@ public class ChatActivity extends AppCompatActivity {
     }
 
 
-    @OnClick({R.id.image, R.id.camera, R.id.phone, R.id.video, R.id.send, R.id.add, R.id.remove})
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_ASK_CAMERA:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission Granted
+                    startCamera();
+                } else {
+                    // Permission Denied
+                    Toast.makeText(this, "未授权使用相机", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case REQUEST_CODE_ASK_RECORD_AUDIO:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission Granted
+                    Toast.makeText(this, "长按录音图标开始录音", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Permission Denied
+                    Toast.makeText(this, "未授权录音", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+
+    @OnClick({R.id.image, R.id.camera, R.id.send, R.id.add, R.id.remove})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.image:
+                PermissionsUtils.verifyStoragePermissions(this);
                 Intent imageIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(imageIntent, IMAGE_REQUEST_CODE);
                 break;
-
             case R.id.camera:
-
                 PermissionsUtils.verifyStoragePermissions(this);
-                fileName = String.valueOf(System.currentTimeMillis()) + ".jpg";
-                File folder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/cozePic/");
-                if (!folder.exists()) {
-                    folder.mkdirs();//创建文件夹
+                if (Build.VERSION.SDK_INT >= 23) {
+                    int checkCallPhonePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+                    if (checkCallPhonePermission != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CODE_ASK_CAMERA);
+                        return;
+                    } else {
+                        startCamera();
+                    }
+                } else {
+                    startCamera();
                 }
-                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT,
-                        CommonUtils.getUriForFile(this, new File(folder.getAbsolutePath(), fileName)));
-                startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
+
                 break;
-            case R.id.phone:
-                break;
-            case R.id.video:
-                break;
+
             case R.id.send:
                 String content = mTextContent.getText().toString().trim();
                 if (TextUtils.isEmpty(content)) {
@@ -525,6 +560,18 @@ public class ChatActivity extends AppCompatActivity {
                 mAddChoose.setVisibility(View.GONE);
                 break;
         }
+    }
+
+    private void startCamera() {
+        fileName = String.valueOf(System.currentTimeMillis()) + ".jpg";
+        File folder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/cozePic/");
+        if (!folder.exists()) {
+            folder.mkdirs();//创建文件夹
+        }
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+                CommonUtils.getUriForFile(this, new File(folder.getAbsolutePath(), fileName)));
+        startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE);
     }
 
 

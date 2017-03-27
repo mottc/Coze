@@ -1,13 +1,18 @@
 package com.mottc.coze.avatar;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -59,6 +64,8 @@ public class UploadAvatarActivity extends AppCompatActivity {
     private static final int IMAGE_REQUEST_CODE = 0;
     private static final int CAMERA_REQUEST_CODE = 1;
     private static final int RESULT_REQUEST_CODE = 2;
+    final public static int REQUEST_CODE_ASK_CAMERA = 123;
+
 
     private UploadManager mUploadManager;
     private String username;
@@ -124,6 +131,24 @@ public class UploadAvatarActivity extends AppCompatActivity {
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_ASK_CAMERA:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission Granted
+                    startCamera();
+                } else {
+                    // Permission Denied
+                    Toast.makeText(this, "未授权使用相机", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     public void startPhotoZoom(Uri uri) {
@@ -228,24 +253,39 @@ public class UploadAvatarActivity extends AppCompatActivity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.pic_from_image:
+                PermissionsUtils.verifyStoragePermissions(this);
+
                 Intent imageIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(imageIntent, IMAGE_REQUEST_CODE);
                 break;
             case R.id.pic_from_camera:
-
                 PermissionsUtils.verifyStoragePermissions(this);
-                File folder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/cozePic/");
-                if (!folder.exists()) {
-                    folder.mkdirs();//创建文件夹
+
+                if (Build.VERSION.SDK_INT >= 23) {
+                    int checkCallPhonePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+                    if(checkCallPhonePermission != PackageManager.PERMISSION_GRANTED){
+                        ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.CAMERA},REQUEST_CODE_ASK_CAMERA);
+                        return;
+                    }else{
+                        startCamera();
+                    }
+                } else {
+                    startCamera();
                 }
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                intent.putExtra(MediaStore.EXTRA_OUTPUT,
-                        CommonUtils.getUriForFile(this, new File(folder.getAbsolutePath(), "avatar.jpg")));
-                startActivityForResult(intent, CAMERA_REQUEST_CODE);
                 break;
         }
     }
 
+    public void startCamera() {
+        File folder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/cozePic/");
+        if (!folder.exists()) {
+            folder.mkdirs();//创建文件夹
+        }
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT,
+                CommonUtils.getUriForFile(this, new File(folder.getAbsolutePath(), "avatar.jpg")));
+        startActivityForResult(intent, CAMERA_REQUEST_CODE);
+    }
 
     private void getFriends() {
 
