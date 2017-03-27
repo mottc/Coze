@@ -152,6 +152,16 @@
             android:textColor="@android:color/white"/>
 
     </LinearLayout>
+    <Button
+        android:id="@+id/quit_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="5dp"
+        android:visibility="gone"
+        android:background="@color/colorPrimary"
+        android:layout_gravity="bottom"
+        android:text="@string/quit_group"
+        android:textColor="@android:color/white"/>
 
 
 </android.support.design.widget.CoordinatorLayout>

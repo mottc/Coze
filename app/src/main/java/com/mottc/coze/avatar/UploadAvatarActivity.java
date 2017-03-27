@@ -15,6 +15,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -70,9 +71,10 @@ public class UploadAvatarActivity extends AppCompatActivity {
     private UploadManager mUploadManager;
     private String username;
     private String password;
-    private Boolean isRegister;
+    private Boolean isUserRegister;
+    private Boolean isGroupCreate;
 
-//    TODO
+    //    TODO
     private OnAvatarChangeListener mOnAvatarChangeListener;
 
     @Override
@@ -84,7 +86,8 @@ public class UploadAvatarActivity extends AppCompatActivity {
         mUploadManager = new UploadManager();
         username = this.getIntent().getStringExtra("username");
         password = this.getIntent().getStringExtra("loginPassword");
-        isRegister = this.getIntent().getBooleanExtra("isRegister", false);
+        isUserRegister = this.getIntent().getBooleanExtra("isUserRegister", false);
+        isGroupCreate = this.getIntent().getBooleanExtra("isGroupCreate", false);
         setupAvatar();
 //TODO
         mOnAvatarChangeListener = MenuListFragment.getInstance();
@@ -92,7 +95,7 @@ public class UploadAvatarActivity extends AppCompatActivity {
     }
 
     private void setupAvatar() {
-        if (!isRegister) {
+        if (!(isUserRegister || isGroupCreate)) {
             AvatarUtils.setAvatarWithoutCache(this, username, mUploadAvatar);
         }
     }
@@ -121,7 +124,7 @@ public class UploadAvatarActivity extends AppCompatActivity {
                 case CAMERA_REQUEST_CODE:
                     File picture = new File(
                             Environment.getExternalStorageDirectory().getPath() + "/cozePic/avatar.jpg");
-                    startPhotoZoom(CommonUtils.getUriForFile(this,picture));
+                    startPhotoZoom(CommonUtils.getUriForFile(this, picture));
                     break;
                 case RESULT_REQUEST_CODE:
                     if (data != null) {
@@ -198,7 +201,7 @@ public class UploadAvatarActivity extends AppCompatActivity {
                         Toast.makeText(UploadAvatarActivity.this, "上传成功", Toast.LENGTH_SHORT).show();
                     }
                 });
-                if (isRegister) {
+                if (isUserRegister) {
                     EMClient.getInstance().login(username, password, new EMCallBack() {
 
                         @Override
@@ -235,18 +238,18 @@ public class UploadAvatarActivity extends AppCompatActivity {
                         }
                     });
                 } else {
-//                    TODO:监听通知太快，头像未及时更新。
                     mPicFromCamera.setClickable(true);
                     mPicFromImage.setClickable(true);
                     mUploading.setVisibility(View.INVISIBLE);
-                    mOnAvatarChangeListener.onAvatarChange();
+                    if ((!isGroupCreate) && (password.equals("用户"))) {
+                        mOnAvatarChangeListener.onAvatarChange();
+                    }
                 }
 
             }
         }, null);
 
     }
-
 
 
     @OnClick({R.id.pic_from_image, R.id.pic_from_camera})
@@ -263,10 +266,10 @@ public class UploadAvatarActivity extends AppCompatActivity {
 
                 if (Build.VERSION.SDK_INT >= 23) {
                     int checkCallPhonePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
-                    if(checkCallPhonePermission != PackageManager.PERMISSION_GRANTED){
-                        ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.CAMERA},REQUEST_CODE_ASK_CAMERA);
+                    if (checkCallPhonePermission != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CODE_ASK_CAMERA);
                         return;
-                    }else{
+                    } else {
                         startCamera();
                     }
                 } else {
@@ -305,7 +308,8 @@ public class UploadAvatarActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-//TODO
+
+    //TODO
     public interface OnAvatarChangeListener {
         void onAvatarChange();
     }

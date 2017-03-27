@@ -104,7 +104,8 @@ public class ChatActivity extends AppCompatActivity {
     protected PowerManager.WakeLock wakeLock;
     private static final int IMAGE_REQUEST_CODE = 0;
     private static final int CAMERA_REQUEST_CODE = 1;
-    final public static int REQUEST_CODE_ASK_CAMERA = 123;
+    public static final int REQUEST_CODE_ASK_CAMERA = 123;
+    public static ChatActivity sChatActivity;
 
 
     protected Handler micImageHandler = new Handler() {
@@ -121,6 +122,7 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
         ButterKnife.bind(this);
+        sChatActivity = this;
         toChatUsername = this.getIntent().getStringExtra("toUsername");
         chat_type = this.getIntent().getIntExtra("chat_type", Constant.USER);
         messages = new ArrayList<>();
@@ -136,7 +138,7 @@ public class ChatActivity extends AppCompatActivity {
                 PowerManager.SCREEN_DIM_WAKE_LOCK, "demo");
         initView();
         getMsg();
-        mChatAdapter = new ChatAdapter(messages, chat_type, this);
+        mChatAdapter = new ChatAdapter(mChatRecyclerView,messages, chat_type, this);
         mChatRecyclerView.setAdapter(mChatAdapter);
         mChatRecyclerView.scrollToPosition(messages.size() - 1);
 //        mChatRecyclerView.smoothScrollToPosition(messages.size() - 1);

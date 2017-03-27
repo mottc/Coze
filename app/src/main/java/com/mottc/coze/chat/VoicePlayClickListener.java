@@ -2,7 +2,6 @@ package com.mottc.coze.chat;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
@@ -10,8 +9,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.SeekBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.hyphenate.chat.EMClient;
@@ -19,6 +16,7 @@ import com.hyphenate.chat.EMMessage;
 import com.hyphenate.chat.EMVoiceMessageBody;
 import com.hyphenate.util.EMLog;
 import com.mottc.coze.R;
+import com.xw.repo.BubbleSeekBar;
 
 import java.io.File;
 
@@ -32,14 +30,15 @@ public class VoicePlayClickListener implements View.OnClickListener {
     private static final String TAG = "VoicePlayClickListener";
     private EMMessage message;
     private EMVoiceMessageBody voiceBody;
-    private SeekBar mSeekBar;
+//    private SeekBar mSeekBar;
+    private BubbleSeekBar mSeekBar;
 
     private MediaPlayer mediaPlayer = null;
     private Activity activity;
     private EMMessage.ChatType chatType;
     private ChatAdapter adapter;
     private Boolean isStop;
-    private TextView mTextView;
+    private ImageView voiceUnread;
     private int voiceProgress;
     private ImageView mVoiceStatus;
 
@@ -55,12 +54,12 @@ public class VoicePlayClickListener implements View.OnClickListener {
     public static VoicePlayClickListener currentPlayListener = null;
     public static String playMsgId;
 
-    public VoicePlayClickListener(EMMessage message, SeekBar seekBar, TextView textView, ChatAdapter adapter, Activity context, ImageView mVoiceStatus,int voiceProgress) {
+    public VoicePlayClickListener(EMMessage message, BubbleSeekBar seekBar, ImageView voiceUnread, ChatAdapter adapter, Activity context, ImageView mVoiceStatus, int voiceProgress) {
         this.message = message;
         voiceBody = (EMVoiceMessageBody) message.getBody();
         this.adapter = adapter;
         mSeekBar = seekBar;
-        mTextView = textView;
+        this.voiceUnread = voiceUnread;
         this.activity = context;
         this.chatType = message.getChatType();
         this.voiceProgress = voiceProgress;
@@ -131,7 +130,7 @@ public class VoicePlayClickListener implements View.OnClickListener {
                 }
                 if (!message.isListened()) {
                     // 隐藏自己未播放这条语音消息的标志
-                    mTextView.setTextColor(Color.WHITE);
+                    voiceUnread.setVisibility(View.GONE);
                     message.setListened(true);
                     EMClient.getInstance().chatManager().setVoiceMessageListened(message);
                 }

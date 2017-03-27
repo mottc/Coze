@@ -5,7 +5,6 @@ import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -15,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.hyphenate.EMCallBack;
@@ -32,6 +30,7 @@ import com.mottc.coze.cache.ImageCache;
 import com.mottc.coze.detail.UserDetailActivity;
 import com.mottc.coze.utils.AvatarUtils;
 import com.mottc.coze.utils.CommonUtils;
+import com.xw.repo.BubbleSeekBar;
 
 import java.io.File;
 import java.util.List;
@@ -51,13 +50,14 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private int chat_type;
     private Context context;
     private Activity mActivity;
-    int voiceProgress = 0;
+    private RecyclerView mRecyclerView;
 
-    public ChatAdapter(List<EMMessage> values, int chat_type, Context context) {
+    public ChatAdapter(RecyclerView recyclerView,List<EMMessage> values, int chat_type, Context context) {
         mValues = values;
         this.chat_type = chat_type;
         this.context = context;
         mActivity = (Activity) context;
+        mRecyclerView = recyclerView;
     }
 
     @Override
@@ -146,16 +146,12 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 }
             });
 
-        }
-
-        if (holder instanceof SendTxtHolder) {
+        }else if (holder instanceof SendTxtHolder) {
             SendTxtHolder sendTxtHolder = (SendTxtHolder) holder;
             EMTextMessageBody emTextMessageBody = (EMTextMessageBody) mValues.get(position).getBody();
             String msg = emTextMessageBody.getMessage();
             sendTxtHolder.mTvChatContent.setText(msg);
-        }
-
-        if (holder instanceof SendImageHolder) {
+        }else if(holder instanceof SendImageHolder) {
             final SendImageHolder sendImageHolder = (SendImageHolder) holder;
             final EMImageMessageBody emImageMessageBody = (EMImageMessageBody) mValues.get(position).getBody();
 
@@ -229,50 +225,99 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     mActivity.startActivity(new Intent(mActivity, ShowImageActivity.class).putExtra("imageUrl",emImageMessageBody.getLocalUrl()));
                 }
             });
-        }
-
-        if (holder instanceof SendVoiceHolder) {
+        }else if (holder instanceof SendVoiceHolder) {
             final SendVoiceHolder sendVoiceHolder = (SendVoiceHolder) holder;
             EMVoiceMessageBody emVoiceMessageBody = (EMVoiceMessageBody) mValues.get(position).getBody();
             int length = emVoiceMessageBody.getLength();
 
-            sendVoiceHolder.mTvLength.setText(String.valueOf(length)+"\"");
-            sendVoiceHolder.mSeekBar.setMax(length);
-            sendVoiceHolder.mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    if (fromUser) {
-                        voiceProgress = progress;
-                    }
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
                 }
 
                 @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    sendVoiceHolder.mSeekBar.correctOffsetWhenContainerOnScrolling();
+                }
+            });
 
+            sendVoiceHolder.mSeekBar.getConfigBuilder()
+                    .min(0)
+                    .max(length)
+                    .progress(0)
+                    .sectionCount(length)
+                    .showSectionText()
+                    .sectionTextColor(mActivity.getResources().getColor(R.color.colorAccent))
+                    .sectionTextSize(18)
+                    .bubbleTextSize(18)
+                    .showSectionMark()
+                    .autoAdjustSectionMark()
+                    .touchToSeek()
+                    .build();
+
+            sendVoiceHolder.mSeekBar.setOnProgressChangedListener(new BubbleSeekBar.OnProgressChangedListenerAdapter() {
+                @Override
+                public void onProgressChanged(int progress, float progressFloat) {
+                    super.onProgressChanged(progress, progressFloat);
                 }
 
                 @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
+                public void getProgressOnActionUp(int progress, float progressFloat) {
+                    super.getProgressOnActionUp(progress, progressFloat);
+                }
 
-                    sendVoiceHolder.mVoiceStatus.setOnClickListener(new VoicePlayClickListener(mValues.get(position),sendVoiceHolder.mSeekBar,null,null,mActivity,sendVoiceHolder.mVoiceStatus,voiceProgress));
+                @Override
+                public void getProgressOnFinally(int progress, float progressFloat) {
+                    super.getProgressOnFinally(progress, progressFloat);
+                    sendVoiceHolder.mVoiceStatus.setOnClickListener(new VoicePlayClickListener(mValues.get(position),sendVoiceHolder.mSeekBar,null,null,mActivity,sendVoiceHolder.mVoiceStatus,progress));
 
                 }
             });
+
+
             sendVoiceHolder.mVoiceStatus.setOnClickListener(new VoicePlayClickListener(mValues.get(position),sendVoiceHolder.mSeekBar,null,null,mActivity,sendVoiceHolder.mVoiceStatus,0));
 
-        }
-        if (holder instanceof ReceiveVoiceHolder) {
+        }else if (holder instanceof ReceiveVoiceHolder) {
             final ReceiveVoiceHolder receiveVoiceHolder = (ReceiveVoiceHolder) holder;
             EMVoiceMessageBody emVoiceMessageBody = (EMVoiceMessageBody) mValues.get(position).getBody();
             int length = emVoiceMessageBody.getLength();
-            receiveVoiceHolder.mTvLength.setText(String.valueOf(length)+"\"");
             if (mValues.get(position).isListened()) {
                 // hide the unread icon
-                receiveVoiceHolder.mTvLength.setTextColor(Color.WHITE);
+                receiveVoiceHolder.mVoiceUnread.setVisibility(View.INVISIBLE);
             } else {
-                receiveVoiceHolder.mTvLength.setTextColor(Color.RED);
+                receiveVoiceHolder.mVoiceUnread.setVisibility(View.VISIBLE);
             }
-            receiveVoiceHolder.mSeekBar.setMax(length);
+
+
+            mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
+                }
+
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    receiveVoiceHolder.mSeekBar.correctOffsetWhenContainerOnScrolling();
+                }
+            });
+
+            receiveVoiceHolder.mSeekBar.getConfigBuilder()
+                    .min(0)
+                    .max(length)
+                    .progress(0)
+                    .sectionCount(length)
+                    .showSectionText()
+                    .sectionTextColor(mActivity.getResources().getColor(R.color.colorAccent))
+                    .sectionTextSize(18)
+                    .bubbleTextSize(18)
+                    .showSectionMark()
+                    .autoAdjustSectionMark()
+                    .touchToSeek()
+                    .build();
+
             if (chat_type == Constant.GROUP) {
                 receiveVoiceHolder.mTvUserName.setVisibility(View.VISIBLE);
                 receiveVoiceHolder.mTvUserName.setText(mValues.get(position).getFrom());
@@ -289,30 +334,30 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     context.startActivity(intent, options.toBundle());
                 }
             });
-            receiveVoiceHolder.mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+
+            receiveVoiceHolder.mSeekBar.setOnProgressChangedListener(new BubbleSeekBar.OnProgressChangedListenerAdapter() {
                 @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    voiceProgress = progress;
+                public void onProgressChanged(int progress, float progressFloat) {
+                    super.onProgressChanged(progress, progressFloat);
                 }
 
                 @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-
+                public void getProgressOnActionUp(int progress, float progressFloat) {
+                    super.getProgressOnActionUp(progress, progressFloat);
                 }
 
                 @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-
-                    receiveVoiceHolder.mVoiceStatus.setOnClickListener(new VoicePlayClickListener(mValues.get(position),receiveVoiceHolder.mSeekBar,receiveVoiceHolder.mTvLength,null,mActivity,receiveVoiceHolder.mVoiceStatus,voiceProgress));
+                public void getProgressOnFinally(int progress, float progressFloat) {
+                    super.getProgressOnFinally(progress, progressFloat);
+                    receiveVoiceHolder.mVoiceStatus.setOnClickListener(new VoicePlayClickListener(mValues.get(position),receiveVoiceHolder.mSeekBar,receiveVoiceHolder.mVoiceUnread,null,mActivity,receiveVoiceHolder.mVoiceStatus,progress));
 
                 }
             });
 
-            receiveVoiceHolder.mVoiceStatus.setOnClickListener(new VoicePlayClickListener(mValues.get(position),receiveVoiceHolder.mSeekBar,receiveVoiceHolder.mTvLength,this,mActivity,receiveVoiceHolder.mVoiceStatus,0));
+            receiveVoiceHolder.mVoiceStatus.setOnClickListener(new VoicePlayClickListener(mValues.get(position),receiveVoiceHolder.mSeekBar,receiveVoiceHolder.mVoiceUnread,this,mActivity,receiveVoiceHolder.mVoiceStatus,0));
 
-        }
-
-        if (holder instanceof ReceiveImageHolder) {
+        }else if (holder instanceof ReceiveImageHolder) {
             final ReceiveImageHolder receiveImageHolder = (ReceiveImageHolder) holder;
             final EMImageMessageBody emImageMessageBody = (EMImageMessageBody) mValues.get(position).getBody();
 
@@ -471,15 +516,12 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         @BindView(R.id.timestamp)
         TextView mTimestamp;
         @BindView(R.id.voice_seekBar)
-        SeekBar mSeekBar;
-        @BindView(R.id.tv_length)
-        TextView mTvLength;
+        BubbleSeekBar mSeekBar;
         @BindView(R.id.bubble)
         RelativeLayout mBubble;
         @BindView(R.id.voice_status)
         ImageView mVoiceStatus;
         SendVoiceHolder(View view) {
-
             super(view);
             ButterKnife.bind(this, view);
         }
@@ -521,9 +563,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         @BindView(R.id.iv_userAvatar)
         ImageView mIvUserAvatar;
         @BindView(R.id.voice_seekBar)
-        SeekBar mSeekBar;
-        @BindView(R.id.tv_length)
-        TextView mTvLength;
+        BubbleSeekBar mSeekBar;
+        @BindView(R.id.voice_read)
+        ImageView mVoiceUnread;
         @BindView(R.id.bubble)
         RelativeLayout mRelativeLayout;
         @BindView(R.id.voice_status)

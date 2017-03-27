@@ -70,6 +70,12 @@ public class UserDetailActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AvatarUtils.setAvatarWithoutCache(this, username, mImage);
+    }
+
     private void initView() {
         setSupportActionBar(mToolbar);
         mToolbar.setNavigationIcon(R.drawable.back);
@@ -106,9 +112,6 @@ public class UserDetailActivity extends AppCompatActivity {
         mCollapsingToolbar.setTitle(username);
         mTvUsername.setText(username);
 
-//        AvatarUtils.setAvatar(this, username, mImage);
-        AvatarUtils.setAvatarWithoutCache(this, username, mImage);
-
     }
 
 
@@ -126,8 +129,13 @@ public class UserDetailActivity extends AppCompatActivity {
                                 @Override
                                 public void onSuccess() {
                                     dialog.dismiss();
-                                    startActivity(new Intent(UserDetailActivity.this, UserDetailActivity.class)
-                                            .putExtra("username",username));
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(UserDetailActivity.this, "已删除好友", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                    ChatActivity.sChatActivity.finish();
                                     finish();
                                 }
                                 @Override
@@ -157,12 +165,14 @@ public class UserDetailActivity extends AppCompatActivity {
                 builder.create().show();
                 break;
             case R.id.btn_send_msg:
+                ChatActivity.sChatActivity.finish();
                 startActivity(new Intent(this, ChatActivity.class).putExtra("toUsername", username));
                 finish();
                 break;
             case R.id.btn_change_avatar:
-                startActivity(new Intent(this, UploadAvatarActivity.class).putExtra("username",username).putExtra("isRegister", false));
-                finish();
+                startActivity(new Intent(this, UploadAvatarActivity.class).putExtra("username",username)
+                        .putExtra("loginPassword","用户").putExtra("isUserRegister", false).putExtra("isGroupCreate", false));
+
                 break;
             case R.id.btn_add_friend:
                 startActivity(new Intent(this, AddNewFriendActivity.class).putExtra("new_name", username));

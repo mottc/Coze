@@ -1,6 +1,7 @@
 package com.mottc.coze.add;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -11,11 +12,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.hyphenate.EMValueCallBack;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMGroup;
 import com.hyphenate.chat.EMGroupManager;
 import com.hyphenate.exceptions.HyphenateException;
 import com.mottc.coze.R;
+import com.mottc.coze.avatar.UploadAvatarActivity;
 import com.mottc.coze.utils.DisplayUtils;
 
 import butterknife.BindView;
@@ -66,34 +69,47 @@ public class CreateGroupActivity extends AppCompatActivity {
             createNewGroup(groupName, desc, new String[0], reason);
         }
     }
+
     private void createNewGroup(final String groupName, final String desc, final String[] allMembers, final String reason) {
 
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    EMGroupManager.EMGroupOptions option = new EMGroupManager.EMGroupOptions();
-                    option.maxUsers = 200;
-                    option.style = EMGroupManager.EMGroupStyle.EMGroupStylePublicJoinNeedApproval;
-                    EMGroup group = EMClient.getInstance().groupManager().createGroup(groupName, desc, allMembers, reason, option);
-                    group.getGroupId();
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            progressDialog.dismiss();
-                            Toast.makeText(CreateGroupActivity.this, "创建成功", Toast.LENGTH_LONG).show();
-                        }
-                    });
-                } catch (final HyphenateException e) {
-                    runOnUiThread(new Runnable() {
-                        public void run() {
-                            progressDialog.dismiss();
-                            Toast.makeText(CreateGroupActivity.this, "创建群组失败"+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
+
+                EMGroupManager.EMGroupOptions option = new EMGroupManager.EMGroupOptions();
+                option.maxUsers = 200;
+                option.style = EMGroupManager.EMGroupStyle.EMGroupStylePublicJoinNeedApproval;
+                EMClient.getInstance().groupManager().asyncCreateGroup(groupName, desc, allMembers, reason, option, new EMValueCallBack<EMGroup>() {
+                    @Override
+                    public void onSuccess(EMGroup value) {
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                progressDialog.dismiss();
+                                Toast.makeText(CreateGroupActivity.this, "创建成功", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                        startActivity(new Intent(CreateGroupActivity.this, UploadAvatarActivity.class).putExtra("username",value.getGroupId())
+                               .putExtra("isRegister",true).putExtra("isGroupCreate", true));
+                        finish();
+
+                    }
+
+                    @Override
+                    public void onError(int error, final String errorMsg) {
+
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                progressDialog.dismiss();
+                                Toast.makeText(CreateGroupActivity.this, "创建群组失败" + errorMsg, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                });
+
             }
         }).start();
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
