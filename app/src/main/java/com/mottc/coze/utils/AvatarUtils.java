@@ -65,7 +65,6 @@ public class AvatarUtils {
                 .into(imageView);
     }
 
-
     public static String createImageToken(String userName) {
         String bucketName = "jungle:" + userName + ".png";
         Auth auth = Auth.create("thx5mKjSsksUU1I24M8XTt5q0DSjgs9tXpMB54gr", "Xw2OGDoefwxGEAuJP_SWHnvm32PssnJgTJRGeHTB");
