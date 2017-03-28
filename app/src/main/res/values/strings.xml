@@ -54,6 +54,7 @@
     <string name="release_to_cancel">松开手指，取消发送</string>
     <string name="Is_download_voice_click_later">正在下载语音，稍后点击</string>
     <string name="quit_group">退出群组</string>
+    <string name="delete_from_group">从群组删除</string>
 
 
 </resources>

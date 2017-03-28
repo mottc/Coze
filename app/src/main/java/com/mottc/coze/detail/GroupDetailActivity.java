@@ -8,13 +8,14 @@ import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -64,9 +65,15 @@ public class GroupDetailActivity extends AppCompatActivity {
     LinearLayout mOwnerLayout;
     @BindView(R.id.quit_group)
     Button mQuitGroup;
+    @BindView(R.id.group_desc)
+    TextView mGroupDesc;
+    @BindView(R.id.more)
+    ImageButton mMore;
 
 
     private String group_id;
+    Boolean isOwner = false;
+    EMGroup group;
 
 
     @Override
@@ -76,7 +83,6 @@ public class GroupDetailActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         group_id = this.getIntent().getStringExtra("group_id");
         initView();
-
         new GetGroupMembers().execute();
 
     }
@@ -101,18 +107,19 @@ public class GroupDetailActivity extends AppCompatActivity {
         mCollapsingToolbar.setCollapsedTitleTextColor(Color.WHITE);
         mCollapsingToolbar.setExpandedTitleColor(Color.WHITE);
         mTvGroupNum.setText(group_id);
-        mGroupMembers.setLayoutManager(new LinearLayoutManager(this));
-        mGroupMembers.setNestedScrollingEnabled(false);
-        mGroupMembers.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
+        mGroupMembers.setLayoutManager(new StaggeredGridLayoutManager(3,
+                StaggeredGridLayoutManager.VERTICAL));
+        mGroupMembers.setNestedScrollingEnabled(false);
     }
 
-    @OnClick({R.id.btn_change_group_avatar, R.id.btn_change_group_name, R.id.quit_group})
+
+    @OnClick({R.id.btn_change_group_avatar, R.id.btn_change_group_name, R.id.quit_group,R.id.more})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_change_group_avatar:
                 startActivity(new Intent(this, UploadAvatarActivity.class).putExtra("username", group_id)
-                        .putExtra("loginPassword","群组").putExtra("isUserRegister", false).putExtra("isGroupCreate", false));
+                        .putExtra("loginPassword", "群组").putExtra("isUserRegister", false).putExtra("isGroupCreate", false));
 
                 break;
             case R.id.quit_group:
@@ -207,14 +214,179 @@ public class GroupDetailActivity extends AppCompatActivity {
                                 dialog.dismiss();
                             }
                         }).show();
+                break;
+
+            case R.id.more:
+
+                final String items[] = {"解散群组","邀请成员","更改群简介"};
+                new AlertDialog.Builder(GroupDetailActivity.this)
+                        .setItems(items, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                switch (which) {
+                                    case 0:
+                                        EMClient.getInstance().groupManager().asyncDestroyGroup(group_id, new EMCallBack() {
+                                            @Override
+                                            public void onSuccess() {
+                                                runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        ChatActivity.sChatActivity.finish();
+                                                        Toast.makeText(GroupDetailActivity.this, "群组已解散", Toast.LENGTH_SHORT).show();
+                                                        finish();
+                                                    }
+                                                });
+
+                                            }
+
+                                            @Override
+                                            public void onError(int code, String error) {
+                                                runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        Toast.makeText(GroupDetailActivity.this, "请重试", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+
+
+                                            }
+
+                                            @Override
+                                            public void onProgress(int progress, String status) {
+
+
+                                            }
+                                        });
+
+                                        break;
+                                    case 1:
+
+                                        final EditText editText = new EditText(GroupDetailActivity.this);
+                                        new AlertDialog.Builder(GroupDetailActivity.this)
+                                                .setTitle("请输入要邀请的成员用户名：")
+                                                .setView(editText)
+                                                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        String username = editText.getText().toString().trim();
+                                                        if (TextUtils.isEmpty(username)) {
+                                                            Toast.makeText(getApplicationContext(), "请输入用户名", Toast.LENGTH_SHORT).show();
+                                                        }
+
+                                                        if (group != null) {
+                                                            List<String> members = group.getMembers();
+
+                                                            if (members.contains(username)) {
+                                                                Toast.makeText(GroupDetailActivity.this, "该用户已是群组成员", Toast.LENGTH_SHORT).show();
+                                                            } else {
+                                                                String[] usernames = new String[]{username} ;
+
+                                                                EMClient.getInstance().groupManager().asyncAddUsersToGroup(group_id, usernames, new EMCallBack() {
+                                                                    @Override
+                                                                    public void onSuccess() {
+                                                                        runOnUiThread(new Runnable() {
+                                                                            @Override
+                                                                            public void run() {
+                                                                                Toast.makeText(GroupDetailActivity.this, "邀请已发出，等待对方同意", Toast.LENGTH_SHORT).show();
+
+                                                                            }
+                                                                        });
+
+                                                                    }
+
+                                                                    @Override
+                                                                    public void onError(int code, String error) {
+                                                                        runOnUiThread(new Runnable() {
+                                                                            @Override
+                                                                            public void run() {
+
+                                                                                Toast.makeText(GroupDetailActivity.this, "请重试", Toast.LENGTH_SHORT).show();
+
+                                                                            }
+                                                                        });
+
+                                                                    }
+
+                                                                    @Override
+                                                                    public void onProgress(int progress, String status) {
+
+                                                                    }
+                                                                });
+                                                            }
+                                                        } else {
+                                                            Toast.makeText(GroupDetailActivity.this, "发生错误：请重启软件！", Toast.LENGTH_SHORT).show();
+                                                        }
+
+                                                    }
+                                                })
+                                                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        dialog.dismiss();
+                                                    }
+                                                }).show();
+                                        break;
+                                    case 2:
+
+                                        final EditText descEditText = new EditText(GroupDetailActivity.this);
+                                        new AlertDialog.Builder(GroupDetailActivity.this)
+                                                .setTitle("请输入新的群简介：")
+                                                .setView(descEditText)
+                                                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        String desc = descEditText.getText().toString().trim();
+
+                                                        EMClient.getInstance().groupManager().asyncChangeGroupDescription(group_id, desc, new EMCallBack() {
+                                                            @Override
+                                                            public void onSuccess() {
+                                                                new GetGroupMembers().execute();
+                                                            }
+
+                                                            @Override
+                                                            public void onError(int code, String error) {
+                                                                runOnUiThread(new Runnable() {
+                                                                    @Override
+                                                                    public void run() {
+                                                                        Toast.makeText(GroupDetailActivity.this, "请重试", Toast.LENGTH_SHORT).show();
+
+                                                                    }
+                                                                });
+
+                                                            }
+
+                                                            @Override
+                                                            public void onProgress(int progress, String status) {
+
+                                                            }
+                                                        });//需异步处理
+                                                    }
+                                                })
+                                                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        dialog.dismiss();
+                                                    }
+                                                }).show();
+
+
+                                        break;
+
+                                }
+                            }
+                        })
+                        .create().show();
 
 
                 break;
+
         }
     }
 
-
     private class GetGroupMembers extends AsyncTask<Void, Void, String[]> {
+
+
         @Override
         protected String[] doInBackground(Void... params) {
 
@@ -231,21 +403,29 @@ public class GroupDetailActivity extends AppCompatActivity {
             // Call setRefreshing(false) when the list has been refreshed.
 
             super.onPostExecute(result);
+
             List<String> group_members = new ArrayList<>();
-            EMGroup group = EMClient.getInstance().groupManager().getGroup(group_id);
+            group = EMClient.getInstance().groupManager().getGroup(group_id);
             mGroupMembers.setVisibility(View.VISIBLE);
             mProgressBar.setVisibility(View.GONE);
             group_members.clear();
             group_members.addAll(group.getMembers());
             if (Objects.equals(group.getOwner(), EMClient.getInstance().getCurrentUser())) {
                 mOwnerLayout.setVisibility(View.VISIBLE);
+                isOwner = true;
             } else {
                 mQuitGroup.setVisibility(View.VISIBLE);
+                mMore.setVisibility(View.GONE);
             }
-            mTvGroupMembers.append(String.valueOf(group.getMemberCount()));
+            mTvGroupMembers.setText(String.valueOf(group.getMemberCount()));
             mCollapsingToolbar.setTitle(group.getGroupName());
             mTvGroupName.setText(group.getGroupName());
-            GroupMembersAdapter groupMembersAdapter = new GroupMembersAdapter(group_members, group.getOwner());
+            if (group.getDescription().isEmpty()) {
+                mGroupDesc.setVisibility(View.GONE);
+            } else {
+                mGroupDesc.setText(group.getDescription());
+            }
+            GroupMembersAdapter groupMembersAdapter = new GroupMembersAdapter(group_members, group.getOwner(), GroupDetailActivity.this);
             mGroupMembers.setAdapter(groupMembersAdapter);
             groupMembersAdapter.setOnGroupMembersListClickListener(new GroupMembersAdapter.OnGroupMembersListClickListener() {
                 @Override
@@ -253,6 +433,54 @@ public class GroupDetailActivity extends AppCompatActivity {
                     startActivity(new Intent(GroupDetailActivity.this, UserDetailActivity.class).putExtra("username", item));
                     finish();
                 }
+
+                @Override
+                public void OnGroupMembersListLongClick(final String item) {
+
+                    if (isOwner) {
+                        String items[] = {"踢出群组"};
+                        new AlertDialog.Builder(GroupDetailActivity.this)
+                                .setItems(items, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                        EMClient.getInstance().groupManager().asyncRemoveUserFromGroup(group_id, item, new EMCallBack() {
+                                            @Override
+                                            public void onSuccess() {
+                                                runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        new GetGroupMembers().execute();
+                                                        if (item.equals(group.getOwner())) {
+                                                            Toast.makeText(GroupDetailActivity.this, "不能踢出群主", Toast.LENGTH_SHORT).show();
+                                                        } else {
+                                                            Toast.makeText(GroupDetailActivity.this, "已踢出", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }
+                                                });
+                                            }
+
+                                            @Override
+                                            public void onError(int code, String error) {
+                                                runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        Toast.makeText(GroupDetailActivity.this, "请重试", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+                                            }
+
+                                            @Override
+                                            public void onProgress(int progress, String status) {
+
+                                            }
+                                        });
+                                    }
+                                })
+                                .create().show();
+                    }
+                }
+
             });
 
         }

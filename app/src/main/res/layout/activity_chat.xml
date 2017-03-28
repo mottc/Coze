@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/chat_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:fitsSystemWindows="true">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/chat_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:theme="@style/AppTheme.AppBarOverlay"
         app:elevation="0dp"
+        app:theme="@style/AppTheme.AppBarOverlay"
         >
 
         <android.support.v7.widget.Toolbar
@@ -23,20 +23,23 @@
             android:background="@color/colorPrimary"
             app:popupTheme="@style/AppTheme.PopupOverlay"
             >
+
             <ImageButton
                 android:id="@+id/btn_detail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="end"
                 android:layout_marginRight="10dp"
                 android:background="#0000"
-                android:layout_gravity="end"/>
+                android:padding="6dp"/>
+
             <TextView
                 android:id="@+id/talkTo"
-                android:transitionName="chatToUserName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
                 android:textSize="18sp"
-                android:textColor="@android:color/white"/>
+                android:transitionName="chatToUserName"/>
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
 
@@ -44,24 +47,26 @@
         android:id="@+id/input_layout"
         android:layout_width="match_parent"
         android:layout_height="42dp"
-        android:orientation="horizontal"
         android:layout_alignParentBottom="true"
         android:background="#eee"
+        android:orientation="horizontal"
         >
+
         <ImageButton
             android:id="@+id/send"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
             android:layout_margin="5dp"
             android:background="@drawable/send"/>
+
         <ImageButton
             android:id="@+id/add"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_alignParentLeft="true"
             android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
             android:layout_margin="5dp"
             android:background="@drawable/add"/>
 
@@ -70,10 +75,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:hint="请输入内容"
-            android:textSize="18sp"
             android:layout_toLeftOf="@id/send"
-            android:layout_toRightOf="@id/add"/>
+            android:layout_toRightOf="@id/add"
+            android:hint="请输入内容"
+            android:textSize="18sp"/>
 
     </RelativeLayout>
 
@@ -81,50 +86,51 @@
         android:id="@+id/add_choose"
         android:layout_width="match_parent"
         android:layout_height="42dp"
-        android:gravity="center_vertical"
-        android:visibility="gone"
+        android:layout_alignParentBottom="true"
         android:background="#eee"
-        android:layout_alignParentBottom="true">
+        android:gravity="center_vertical"
+        android:visibility="gone">
 
         <ImageButton
             android:id="@+id/remove"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:background="#0000"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
+            android:background="#0000"
             android:src="@drawable/remove"/>
 
         <ImageButton
             android:id="@+id/image"
             android:layout_width="38dp"
             android:layout_height="38dp"
-            android:background="#0000"
-            android:layout_marginTop="2dp"
             android:layout_marginBottom="2dp"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="10dp"
+            android:layout_marginTop="2dp"
+            android:background="#0000"
             android:src="@drawable/image"/>
 
         <ImageButton
             android:id="@+id/camera"
             android:layout_width="38dp"
             android:layout_height="38dp"
-            android:layout_marginTop="2dp"
             android:layout_marginBottom="2dp"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="10dp"
+            android:layout_marginTop="2dp"
             android:background="#0000"
             android:src="@drawable/camera"/>
+
         <ImageButton
             android:id="@+id/voice"
             android:layout_width="38dp"
             android:layout_height="38dp"
-            android:layout_marginTop="2dp"
             android:layout_marginBottom="2dp"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="10dp"
+            android:layout_marginTop="2dp"
             android:background="#0000"
             android:src="@drawable/voice"/>
 
@@ -138,10 +144,10 @@
         android:id="@+id/chat_recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layoutManager="LinearLayoutManager"
-        android:layout_marginBottom="42dp"
         android:layout_below="@id/chat_bar"
+        android:layout_marginBottom="42dp"
         android:background="@android:color/white"
+        app:layoutManager="LinearLayoutManager"
         tools:context="com.mottc.coze.main.ChatActivity">
 
     </android.support.v7.widget.RecyclerView>
@@ -150,23 +156,25 @@
         android:id="@+id/voice_recorder"
         android:layout_width="160dp"
         android:layout_height="160dp"
-        android:background="@drawable/voice_bg"
-        android:paddingTop="20dp"
         android:layout_centerInParent="true"
+        android:background="@drawable/voice_bg"
         android:orientation="vertical"
+        android:paddingTop="20dp"
         android:visibility="gone">
+
         <ImageView
             android:id="@+id/voice_image"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_gravity="center"
             android:src="@drawable/voice1"/>
+
         <TextView
             android:id="@+id/voice_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="12dp"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center"
+            android:textSize="12dp"/>
     </LinearLayout>
 
 </RelativeLayout>

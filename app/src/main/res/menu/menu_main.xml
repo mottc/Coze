@@ -7,5 +7,4 @@
         android:icon="@drawable/menu_add"
         android:orderInCategory="100"
         app:showAsAction="always" />
-
 </menu>
