@@ -7,19 +7,14 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.v4.content.FileProvider;
 
-import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMConversation;
 import com.hyphenate.util.EMLog;
 import com.hyphenate.util.PathUtil;
 import com.mottc.coze.Constant;
-import com.mottc.coze.CozeApplication;
-import com.mottc.coze.bean.CozeUser;
-import com.mottc.coze.db.CozeUserDao;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created with Android Studio
@@ -54,23 +49,7 @@ public class CommonUtils {
         }
     }
 
-    //TODO
-    public static String getNickName(String username) {
-        String nickname = CommonUtils.getCozeUserFromDB(username).getNickName();
-        if (nickname == null) {
-            nickname = username;
-        }
-        return nickname;
-    }
 
-    //TODO
-    public static CozeUser getCozeUserFromDB(String username) {
-        List<CozeUser> cozeUserList = CozeApplication.getInstance().getDaoSession(EMClient.getInstance().getCurrentUser())
-                .getCozeUserDao().queryBuilder()
-                .where(CozeUserDao.Properties.UserName.eq(username))
-                .list();
-        return cozeUserList.get(0);
-    }
 
     public static String getThumbnailImagePath(String thumbRemoteUrl) {
         String thumbImageName= thumbRemoteUrl.substring(thumbRemoteUrl.lastIndexOf("/") + 1, thumbRemoteUrl.length());

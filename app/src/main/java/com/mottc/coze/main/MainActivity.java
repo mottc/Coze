@@ -131,7 +131,6 @@ public class MainActivity extends AppCompatActivity
         mMenuDialogFragment.setItemClickListener(new OnMenuItemClickListener() {
             @Override
             public void onMenuItemClick(View clickedView, int position) {
-//                Toast.makeText(Parent(), String.valueOf(position), Toast.LENGTH_SHORT).show();
                 switch (position) {
                     case 1:
                         startActivity(new Intent(MainActivity.this, AddNewFriendActivity.class));
@@ -146,8 +145,6 @@ public class MainActivity extends AppCompatActivity
                         startActivity(new Intent(MainActivity.this, MessageActivity.class));
                         break;
                 }
-//TODO:
-
             }
         });
     }
@@ -373,9 +370,7 @@ public class MainActivity extends AppCompatActivity
 
         public void notificationWithIntent(String title, String text) {
             Intent intent = new Intent(mContext, MessageActivity.class);
-            //TODO:参数
             PendingIntent pIntent = PendingIntent.getActivity(mContext, 1, intent, 0);
-
             NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext)
                     .setSmallIcon(R.drawable.myicon)
                     .setContentTitle(title)
@@ -486,7 +481,7 @@ public class MainActivity extends AppCompatActivity
 
         private void notificationWithIntent(String title, String text) {
             Intent intent = new Intent(mContext, MessageActivity.class);
-            //TODO:参数
+
             PendingIntent pIntent = PendingIntent.getActivity(mContext, 1, intent, 0);
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext)

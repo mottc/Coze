@@ -153,7 +153,6 @@ public class MenuListFragment extends Fragment implements UploadAvatarActivity.O
     }
 
 
-    //    TODO
     @Override
     public void onAvatarChange() {
         loadAvatar(currentUsername);

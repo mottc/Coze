@@ -378,7 +378,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     context.startActivity(intent, options.toBundle());
                 }
             });
-//TODO:
             if (emImageMessageBody.thumbnailDownloadStatus() == EMFileMessageBody.EMDownloadStatus.DOWNLOADING ||
                     emImageMessageBody.thumbnailDownloadStatus() == EMFileMessageBody.EMDownloadStatus.PENDING) {
                 receiveImageHolder.mReceiveImage.setImageResource(R.drawable.image);

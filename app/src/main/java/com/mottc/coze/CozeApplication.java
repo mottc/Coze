@@ -57,7 +57,7 @@ public class CozeApplication extends Application {
         boolean success = initSDK(context, options);
         if (success) {
 //          TODO:设为调试模式，打成正式包时，最好设为false，以免消耗额外的资源
-            EMClient.getInstance().setDebugMode(true);
+            EMClient.getInstance().setDebugMode(false);
             // 初始化数据库
             initDbDao(context);
         }

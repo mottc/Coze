@@ -107,7 +107,6 @@ public class VoicePlayClickListener implements View.OnClickListener {
             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
-                    // TODO Auto-generated method stub
                     mediaPlayer.release();
                     mediaPlayer = null;
                     voiceProgress = 0;

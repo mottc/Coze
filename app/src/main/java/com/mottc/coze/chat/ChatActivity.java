@@ -216,7 +216,7 @@ public class ChatActivity extends AppCompatActivity {
             case MotionEvent.ACTION_DOWN:
 
                 try {
-//                    TODO
+
                     if (VoicePlayClickListener.isPlaying)
                         VoicePlayClickListener.currentPlayListener.stopPlayVoice();
                     v.setPressed(true);

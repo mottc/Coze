@@ -60,9 +60,6 @@ public class ConversationRecyclerViewAdapter extends RecyclerView.Adapter<Conver
             setContent(holder, position, userName);
         } else {
             AvatarUtils.setAvatar(context, conversationId, holder.mAvatar);
-
-//            TODO:
-//            String nickname = CommonUtils.getNickName(conversationId);
             holder.mUsername.setText(conversationId);
             holder.mIsGroup.setVisibility(View.GONE);
             setContent(holder, position, "");

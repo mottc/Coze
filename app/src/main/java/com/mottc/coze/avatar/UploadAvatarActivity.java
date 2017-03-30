@@ -72,8 +72,6 @@ public class UploadAvatarActivity extends AppCompatActivity {
     private String password;
     private Boolean isUserRegister;
     private Boolean isGroupCreate;
-
-    //    TODO
     private OnAvatarChangeListener mOnAvatarChangeListener;
 
     @Override
@@ -88,7 +86,6 @@ public class UploadAvatarActivity extends AppCompatActivity {
         isUserRegister = this.getIntent().getBooleanExtra("isUserRegister", false);
         isGroupCreate = this.getIntent().getBooleanExtra("isGroupCreate", false);
         setupAvatar();
-//TODO
         mOnAvatarChangeListener = MenuListFragment.getInstance();
 
     }
@@ -308,7 +305,6 @@ public class UploadAvatarActivity extends AppCompatActivity {
         }
     }
 
-    //TODO
     public interface OnAvatarChangeListener {
         void onAvatarChange();
     }

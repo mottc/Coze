@@ -104,13 +104,7 @@ public class ContactFragment extends Fragment {
         mListener = null;
         daoSession.getDatabase().close();
     }
-//TODO:为什么要刷新
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        getContactList();
-//        mContactRecyclerViewAdapter.notifyDataSetChanged();
-//    }
+
 
     /**
      * 获取联系人列表
