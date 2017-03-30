@@ -84,7 +84,6 @@ public class GroupDetailActivity extends AppCompatActivity {
         group_id = this.getIntent().getStringExtra("group_id");
         initView();
         new GetGroupMembers().execute();
-
     }
 
     @Override
@@ -114,7 +113,7 @@ public class GroupDetailActivity extends AppCompatActivity {
     }
 
 
-    @OnClick({R.id.btn_change_group_avatar, R.id.btn_change_group_name, R.id.quit_group,R.id.more})
+    @OnClick({R.id.btn_change_group_avatar, R.id.btn_change_group_name, R.id.quit_group, R.id.more})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_change_group_avatar:
@@ -218,7 +217,7 @@ public class GroupDetailActivity extends AppCompatActivity {
 
             case R.id.more:
 
-                final String items[] = {"解散群组","邀请成员","更改群简介"};
+                final String items[] = {"解散群组", "邀请成员", "更改群简介"};
                 new AlertDialog.Builder(GroupDetailActivity.this)
                         .setItems(items, new DialogInterface.OnClickListener() {
                             @Override
@@ -280,7 +279,7 @@ public class GroupDetailActivity extends AppCompatActivity {
                                                             if (members.contains(username)) {
                                                                 Toast.makeText(GroupDetailActivity.this, "该用户已是群组成员", Toast.LENGTH_SHORT).show();
                                                             } else {
-                                                                String[] usernames = new String[]{username} ;
+                                                                String[] usernames = new String[]{username};
 
                                                                 EMClient.getInstance().groupManager().asyncAddUsersToGroup(group_id, usernames, new EMCallBack() {
                                                                     @Override

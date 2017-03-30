@@ -479,6 +479,7 @@ public class MainActivity extends AppCompatActivity
 
         }
 
+
         private void notificationWithIntent(String title, String text) {
             Intent intent = new Intent(mContext, MessageActivity.class);
 
