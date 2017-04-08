@@ -127,7 +127,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
-                    android:background="#ccc"
+                    android:textColor="@android:color/holo_orange_light"
                     android:padding="6dp"
                     android:layout_below="@id/cardView"/>
                 <LinearLayout
