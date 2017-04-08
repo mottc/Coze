@@ -16,6 +16,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
 import com.hyphenate.chat.EMFileMessageBody;
@@ -455,7 +456,11 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         Bitmap bitmap = ImageCache.getInstance().get(thumbernailPath);
         if (bitmap != null) {
             // thumbnail image is already loaded, reuse the drawable
-            iv.setImageBitmap(bitmap);
+//            iv.setImageBitmap(bitmap);
+            Glide
+                    .with(context)
+                    .load(bitmap)
+                    .into(iv);
             return true;
         } else {
             new AsyncTask<Object, Void, Bitmap>() {
@@ -482,7 +487,11 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                 protected void onPostExecute(Bitmap image) {
                     if (image != null) {
-                        iv.setImageBitmap(image);
+//                        iv.setImageBitmap(image);
+                        Glide
+                                .with(context)
+                                .load(image)
+                                .into(iv);
                         ImageCache.getInstance().put(thumbernailPath, image);
                     } else {
 //                        TODO
