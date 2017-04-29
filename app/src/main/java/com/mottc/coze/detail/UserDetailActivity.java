@@ -170,8 +170,11 @@ public class UserDetailActivity extends AppCompatActivity {
                 finish();
                 break;
             case R.id.btn_change_avatar:
-                startActivity(new Intent(this, UploadAvatarActivity.class).putExtra("username",username)
-                        .putExtra("loginPassword","用户").putExtra("isUserRegister", false).putExtra("isGroupCreate", false));
+                startActivity(new Intent(this, UploadAvatarActivity.class)
+                        .putExtra("username",username)
+                        .putExtra("loginPassword","用户")
+                        .putExtra("isUserRegister", false)
+                        .putExtra("isGroupCreate", false));
 
                 break;
             case R.id.btn_add_friend:
