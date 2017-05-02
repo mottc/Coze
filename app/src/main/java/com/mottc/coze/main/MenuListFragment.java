@@ -42,14 +42,13 @@ public class MenuListFragment extends Fragment implements UploadAvatarActivity.O
 
     ImageView user_photo;
     TextView user_name;
-    String currentUsername = EMClient.getInstance().getCurrentUser();
-
 
     private static class SingletonInstance {
         private static final MenuListFragment INSTANCE = new MenuListFragment();
     }
 
     public static MenuListFragment getInstance() {
+
         return SingletonInstance.INSTANCE;
     }
 
@@ -109,13 +108,12 @@ public class MenuListFragment extends Fragment implements UploadAvatarActivity.O
         CozeApplication.getInstance().logout(true, new EMCallBack() {
             @Override
             public void onSuccess() {
-                getActivity().finish();
+                MainActivity.mMainActivity.finish();
                 startActivity(new Intent(getActivity(), LoginActivity.class));
             }
 
             @Override
             public void onError(int code, String error) {
-
                 Toast.makeText(getActivity(), R.string.try_again, Toast.LENGTH_SHORT).show();
             }
 
@@ -126,10 +124,9 @@ public class MenuListFragment extends Fragment implements UploadAvatarActivity.O
         });
     }
 
-    private void setupHeader() {
-
-        loadAvatar(currentUsername);
-        user_name.setText(currentUsername);
+    public void setupHeader() {
+        loadAvatar(CozeApplication.getInstance().getCurrentUserName());
+        user_name.setText(CozeApplication.getInstance().getCurrentUserName());
     }
 
     private void loadAvatar(String currentUsername) {
@@ -155,7 +152,7 @@ public class MenuListFragment extends Fragment implements UploadAvatarActivity.O
 
     @Override
     public void onAvatarChange() {
-        loadAvatar(currentUsername);
+        loadAvatar(CozeApplication.getInstance().getCurrentUserName());
     }
 
 }

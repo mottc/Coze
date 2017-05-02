@@ -76,12 +76,14 @@ public class MainActivity extends AppCompatActivity
     private InviteMessageDao mInviteMessageDao;
     private CozeUserDao mCozeUserDao;
     private NotificationManager mNotificationManager;
+    public static MainActivity mMainActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        mMainActivity = this;
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         fragmentManager = getSupportFragmentManager();
         mInviteMessageDao = CozeApplication.getInstance().getDaoSession(EMClient.getInstance().getCurrentUser()).getInviteMessageDao();
