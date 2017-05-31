@@ -22,8 +22,8 @@
 
     <TextView
         android:id="@+id/unread_num"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:layout_alignBottom="@id/avatar"
         android:layout_alignParentEnd="true"
         android:layout_marginRight="5dp"

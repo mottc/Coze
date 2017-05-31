@@ -121,6 +121,9 @@ public class MainActivity extends AppCompatActivity
         if (mMenuFragment == null) {
             mMenuFragment = MenuListFragment.getInstance();
             fm.beginTransaction().add(R.id.id_container_menu, mMenuFragment).commit();
+        } else {
+            mMenuFragment = MenuListFragment.getInstance();
+            fm.beginTransaction().add(R.id.id_container_menu, mMenuFragment).commit();
         }
     }
 
